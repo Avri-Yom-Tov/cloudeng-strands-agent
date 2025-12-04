@@ -24,97 +24,107 @@ PREDEFINED_TASKS = {
     "invocation_trends": "Analyze invocation trends over time"
 }
 
-# Set up MCP clients with platform-specific configurations
-is_windows = sys.platform.startswith('win')
-print(f"Detected platform: {'Windows' if is_windows else 'Non-Windows (Linux/macOS)'}")
+# Initialize MCP clients (will be done once in Streamlit session state)
+time_mcp_client = None
+cloudwatch_mcp_client = None
+time_tools = []
+cloudwatch_tools = []
 
-try:
-    if is_windows:
-        # Windows-specific configuration
-        print("Using Windows-specific MCP configuration...")
-        
-        # Set up Time MCP client for Windows
-        time_mcp_client = MCPClient(lambda: stdio_client(
-            StdioServerParameters(
-                command="uvx",
-                args=["mcp-server-time"]
-            )
-        ))
-        
-        # Set up CloudWatch MCP client for Windows
-        cloudwatch_mcp_client = MCPClient(lambda: stdio_client(
-            StdioServerParameters(
-                command="uvx",
-                args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server.exe"],
-                env={"FASTMCP_LOG_LEVEL": "ERROR"}
-            )
-        ))
-    else:
-        # Non-Windows configuration (Linux/macOS)
-        print("Using standard MCP configuration for Linux/macOS...")
-        
-        # Set up Time MCP client
-        time_mcp_client = MCPClient(lambda: stdio_client(
-            StdioServerParameters(
-                command="uvx",
-                args=["mcp-server-time"]
-            )
-        ))
-        
-        # Set up CloudWatch MCP client (without .exe extension)
-        cloudwatch_mcp_client = MCPClient(lambda: stdio_client(
-            StdioServerParameters(
-                command="uvx",
-                args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server"],
-                env={"FASTMCP_LOG_LEVEL": "ERROR"}
-            )
-        ))
-
-    # Start both MCP clients
-    print("Starting Time MCP client...")
-    time_mcp_client.start()
-    print("Time MCP client started successfully.")
+def initialize_mcp_clients():
+    """Initialize MCP clients once"""
+    global time_mcp_client, cloudwatch_mcp_client, time_tools, cloudwatch_tools
     
-    print("Starting CloudWatch MCP client...")
-    cloudwatch_mcp_client.start()
-    print("CloudWatch MCP client started successfully.")
+    is_windows = sys.platform.startswith('win')
+    print(f"Detected platform: {'Windows' if is_windows else 'Non-Windows (Linux/macOS)'}")
+
+    try:
+        if is_windows:
+            # Windows-specific configuration
+            print("Using Windows-specific MCP configuration...")
+            
+            # Set up Time MCP client for Windows
+            time_mcp_client = MCPClient(lambda: stdio_client(
+                StdioServerParameters(
+                    command="uvx",
+                    args=["mcp-server-time"]
+                )
+            ))
+            
+            # Set up CloudWatch MCP client for Windows
+            cloudwatch_mcp_client = MCPClient(lambda: stdio_client(
+                StdioServerParameters(
+                    command="uvx",
+                    args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server.exe"],
+                    env={"FASTMCP_LOG_LEVEL": "ERROR"}
+                )
+            ))
+        else:
+            # Non-Windows configuration (Linux/macOS)
+            print("Using standard MCP configuration for Linux/macOS...")
+            
+            # Set up Time MCP client
+            time_mcp_client = MCPClient(lambda: stdio_client(
+                StdioServerParameters(
+                    command="uvx",
+                    args=["mcp-server-time"]
+                )
+            ))
+            
+            # Set up CloudWatch MCP client (without .exe extension)
+            cloudwatch_mcp_client = MCPClient(lambda: stdio_client(
+                StdioServerParameters(
+                    command="uvx",
+                    args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server"],
+                    env={"FASTMCP_LOG_LEVEL": "ERROR"}
+                )
+            ))
+
+        # Start both MCP clients
+        print("Starting Time MCP client...")
+        time_mcp_client.start()
+        print("Time MCP client started successfully.")
+        
+        print("Starting CloudWatch MCP client...")
+        cloudwatch_mcp_client.start()
+        print("CloudWatch MCP client started successfully.")
+        
+        # Get tools from MCP clients
+        time_tools = time_mcp_client.list_tools_sync()
+        cloudwatch_tools = cloudwatch_mcp_client.list_tools_sync()
+
+        print(f"Available Time tools: {len(time_tools)} tools loaded")
+        print(f"Available CloudWatch tools: {len(cloudwatch_tools)} tools loaded")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error initializing MCP clients: {str(e)}")
+        raise
+
+def get_bedrock_model():
+    """Get or create Bedrock model"""
+    # Configure AWS profiles for cross-account access
+    wfoprod_profile = os.environ.get("AWS_PROFILE")
+
+    # Temporarily use default profile for Bedrock
+    os.environ["AWS_PROFILE"] = "default"
+
+    # Create a BedrockModel - using Claude 3.5 Sonnet
+    bedrock_model = BedrockModel(
+        model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0"),
+        region_name=AWS_REGION,
+        temperature=0.1,
+    )
+
+    # Restore wfoprod profile for use_aws tool
+    if wfoprod_profile:
+        os.environ["AWS_PROFILE"] = wfoprod_profile
     
-    # Set flag to indicate MCP clients are initialized
-    mcp_initialized = True
-    
-except Exception as e:
-    mcp_initialized = False
-    error_message = str(e)
-    print(f"Error initializing MCP clients: {error_message}")
-    
-    raise
+    return bedrock_model
 
-# Get tools from MCP clients
-time_tools = time_mcp_client.list_tools_sync()
-cloudwatch_tools = cloudwatch_mcp_client.list_tools_sync()
-
-print(f"Available Time tools: {len(time_tools)} tools loaded")
-print(f"Available CloudWatch tools: {len(cloudwatch_tools)} tools loaded")
-
-# Configure AWS profiles for cross-account access
-wfoprod_profile = os.environ.get("AWS_PROFILE")
-
-# Temporarily use default profile for Bedrock
-os.environ["AWS_PROFILE"] = "default"
-
-# Create a BedrockModel - using Claude 3.5 Sonnet
-bedrock_model = BedrockModel(
-    model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0"),
-    region_name=AWS_REGION,
-    temperature=0.1,
-)
-
-# Restore wfoprod profile for use_aws tool
-if wfoprod_profile:
-    os.environ["AWS_PROFILE"] = wfoprod_profile
-
-# System prompt for the agent
-system_prompt = f"""
+def get_system_prompt():
+    """Get system prompt for the agent"""
+    return f"""
 You are an expert AWS Production Support Engineer assistant. Your primary role is to help 
 monitor, troubleshoot, and analyze production systems, with a focus on:
 
@@ -157,24 +167,29 @@ When querying specific resources, ONLY query that resource - don't make assumpti
 IMPORTANT: Never include <thinking> tags or expose your internal thought process in responses.
 """
 
-# Create the agent with all tools and Bedrock model
-agent = Agent(
-    tools=[use_aws] + time_tools + cloudwatch_tools,
-    model=bedrock_model,
-    system_prompt=system_prompt
-)
+def get_agent():
+    """Get or create the agent"""
+    global time_tools, cloudwatch_tools
+    return Agent(
+        tools=[use_aws] + time_tools + cloudwatch_tools,
+        model=get_bedrock_model(),
+        system_prompt=get_system_prompt()
+    )
 
 # Register cleanup handler for MCP clients
 def cleanup():
+    global time_mcp_client, cloudwatch_mcp_client
     try:
-        time_mcp_client.stop()
-        print("Time MCP client stopped")
+        if time_mcp_client:
+            time_mcp_client.stop()
+            print("Time MCP client stopped")
     except Exception as e:
         print(f"Error stopping Time MCP client: {e}")
     
     try:
-        cloudwatch_mcp_client.stop()
-        print("CloudWatch MCP client stopped")
+        if cloudwatch_mcp_client:
+            cloudwatch_mcp_client.stop()
+            print("CloudWatch MCP client stopped")
     except Exception as e:
         print(f"Error stopping CloudWatch MCP client: {e}")
 
@@ -193,6 +208,7 @@ def execute_predefined_task(task_key: str) -> str:
 def execute_custom_task(task_description: str) -> str:
     """Execute a custom production support task based on description"""
     try:
+        agent = get_agent()
         response = agent(task_description)
         
         # Handle AgentResult object by extracting the message
@@ -249,6 +265,12 @@ if __name__ == "__main__":
     st.set_page_config(page_title="Production Support", page_icon="🔧", layout="wide")
     
     st.title("🔧 AWS Production Support")
+    
+    # Initialize MCP clients only once
+    if "mcp_initialized" not in st.session_state:
+        with st.spinner("Initializing MCP clients..."):
+            initialize_mcp_clients()
+            st.session_state.mcp_initialized = True
     
     if "messages" not in st.session_state:
         st.session_state.messages = []
