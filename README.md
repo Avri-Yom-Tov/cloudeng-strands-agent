@@ -320,3 +320,7 @@ How many invocations were there in the last 5 hour for Lambda production-lambda-
 
 How much does it cost to scan a file through Guard Duty, for example, a file that weighs 5 MB, and if I have a lot of files, how can I save on scanning ..
 is there diff in prise 5 file of 20 mb VS 1 file of 20mb ?
+
+
+how many failures was for production-lambda-hybrid-recording-audio in last 2 days
+and way 
