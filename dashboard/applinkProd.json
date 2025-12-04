@@ -1,0 +1,1133 @@
+{
+    "start": "-P1D",
+    "widgets": [
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 76,
+            "width": 9,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "m6+m7", "label": "screen", "id": "e1" } ],
+                    [ "AWS/Lambda", "Throttles", "FunctionName", "production-lambda-applink-metadata-producer", { "label": "metadata-producer", "region": "us-west-2", "color": "#ffbb78", "id": "m1" } ],
+                    [ "...", "production-lambda-hybrid-recording-user-token", { "label": "user-token", "region": "us-west-2", "color": "#98df8a", "id": "m2" } ],
+                    [ "...", "production-lambda-applink-kinesis-consumer", { "label": "kinesis-consumer", "region": "us-west-2", "color": "#17becf", "id": "m4" } ],
+                    [ "...", "production-lambda-hybrid-recording-audio", { "color": "#9467bd", "region": "us-west-2", "label": "audio", "id": "m5" } ],
+                    [ "...", "production-lambda-hybrid-recording-screen", { "label": "screen-default", "region": "us-west-2", "color": "#f7b6d2", "id": "m6", "visible": false } ],
+                    [ ".", ".", ".", "production-lambda-hybrid-recording-screen-large", "Resource", "production-lambda-hybrid-recording-screen-large", { "label": "screen-large", "id": "m7", "visible": false } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "Main Lambdas Throttles",
+                "period": 60,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 59,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "# **Contact ID Ranges Availability and Consumption**\n"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# **AppLink Resources Overview**\n"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 68,
+            "width": 9,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "m6+m7", "label": "screen", "id": "e1" } ],
+                    [ "AWS/Lambda", "Invocations", "FunctionName", "production-lambda-applink-metadata-producer", { "color": "#ffbb78", "region": "us-west-2", "label": "metadata-producer", "id": "m1" } ],
+                    [ "...", "production-lambda-hybrid-recording-user-token", { "label": "user-token", "color": "#98df8a", "region": "us-west-2", "id": "m2" } ],
+                    [ "...", "production-lambda-applink-kinesis-consumer", { "region": "us-west-2", "color": "#17becf", "label": "kinesis-consumer", "id": "m4" } ],
+                    [ "...", "production-lambda-hybrid-recording-audio", { "color": "#9467bd", "region": "us-west-2", "label": "audio", "id": "m5" } ],
+                    [ "...", "production-lambda-hybrid-recording-screen", { "region": "us-west-2", "color": "#f7b6d2", "label": "screen-default", "visible": false, "id": "m6" } ],
+                    [ ".", ".", ".", "production-lambda-hybrid-recording-screen-large", "Resource", "production-lambda-hybrid-recording-screen-large", { "label": "screen-large", "visible": false, "id": "m7" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 60,
+                "stat": "Sum",
+                "title": "Main Lambdas Invocations"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 9,
+            "y": 68,
+            "width": 8,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [ "AWS/Lambda", "Errors", "FunctionName", "production-lambda-applink-metadata-producer", { "color": "#ffbb78", "region": "us-west-2", "label": "metadata-producer" } ],
+                    [ "...", "production-lambda-hybrid-recording-user-token", { "label": "user-token", "color": "#98df8a", "region": "us-west-2" } ],
+                    [ "...", "production-lambda-applink-kinesis-consumer", { "region": "us-west-2", "label": "kinesis-consumer", "color": "#17becf" } ],
+                    [ "AWS/States", "ExecutionsFailed", "StateMachineArn", "arn:aws:states:us-west-2:918987959928:stateMachine:production-applink-audio-state-machine", { "region": "us-west-2", "color": "#9467bd", "label": "Audio State Machine Execution Failed" } ],
+                    [ "...", "arn:aws:states:us-west-2:918987959928:stateMachine:production-applink-screen-state-machine", { "region": "us-west-2", "label": "Screen State Machine Execution Failed", "color": "#f7b6d2" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 60,
+                "stat": "Sum",
+                "title": "Main Errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 45,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "SyntheticMonitors", "Failures", "TestName", "sm-e2e-hybrid-recording", { "color": "#d62728", "region": "us-west-2" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": true,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "SM Failures"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 9,
+            "y": 76,
+            "width": 8,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ "AWS/Lambda", "Errors", "FunctionName", "production-lambda-applink-metadata-producer", { "color": "#ffbb78", "region": "us-west-2", "label": "metadata errors" } ],
+                    [ ".", "production-metadata-producer-business-data-warning", ".", ".", { "region": "us-west-2", "label": "metadata-producer-business-data-warning" } ],
+                    [ ".", "production-metadata-producer-general-service-failure", ".", ".", { "region": "us-west-2", "label": "metadata-producer-general-service-failure" } ],
+                    [ ".", "production-metadata-producer-sqs-send-failure", ".", ".", { "region": "us-west-2", "label": "metadata-producer-sqs-send-failure" } ],
+                    [ ".", "production-metadata-producer-contact-DDB-failure", ".", ".", { "region": "us-west-2", "label": "metadata-producer-contact-DDB-failure" } ],
+                    [ ".", "production-metadata-producer-business-data-failure", ".", ".", { "region": "us-west-2", "label": "metadata-producer-business-data-failure" } ],
+                    [ ".", "production-metadata-producer-s3-put-error", ".", ".", { "region": "us-west-2", "label": "metadata-producer-s3-put-error" } ],
+                    [ ".", "production-missed-calls-no-missed-calls-permissions", ".", "missed-calls-lambda", { "region": "us-west-2", "label": "missed-calls-no-missed-calls-permissions" } ],
+                    [ ".", "production-metadata-producer-without-OsLogin-failure", ".", ".", { "region": "us-west-2", "label": "metadata-producer-without-OsLogin-failure" } ],
+                    [ ".", "production-metadata-producer-recording-out-of-interaction-time-information", ".", ".", { "region": "us-west-2", "label": "metadata-producer-recording-out-of-interaction-time-information" } ],
+                    [ "production.service.metrics", "production-metadata-producer-failed-to-get-token-form-user-token-lambda", "AppLink", "metadata-producer", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-batch-size-information", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-input-not-valid-failure", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-teamID-not-found-failure", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-without-media-files-failure", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-general-service-failure", ".", "missed-calls-lambda", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-teamID-not-found-failure", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-filtered-calls-due-to-time-range-information", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-batch-size-information", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-filtered-calls-due-to-time-range-information", ".", ".", { "visible": false, "region": "us-west-2" } ],
+                    [ ".", "request-batch-size", ".", "storage-access-provider", { "visible": false, "region": "us-west-2" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 60,
+                "stat": "Sum",
+                "title": "Metadata flow errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 17,
+            "y": 76,
+            "width": 7,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "m2+m5", "label": "screen input failure", "id": "e1" } ],
+                    [ { "expression": "m1+m6", "label": "audio input failure", "id": "e2" } ],
+                    [ "production.service.metrics", "production-lambda-hybrid-audio-processing-default-input-failure", "AppLinkFailures", "gauge", { "label": "audio-default  input-failure", "region": "us-west-2", "id": "m1", "visible": false } ],
+                    [ ".", "production-lambda-hybrid-screen-processing-default-input-failure", ".", ".", { "label": "screen-default  input-failure", "color": "#ff7f0e", "region": "us-west-2", "id": "m2", "visible": false } ],
+                    [ "AWS/States", "ExecutionsFailed", "StateMachineArn", "arn:aws:states:us-west-2:918987959928:stateMachine:production-applink-audio-state-machine", { "region": "us-west-2", "label": "Audio State Machine Execution Failed", "color": "#ff9896", "id": "m3" } ],
+                    [ "...", "arn:aws:states:us-west-2:918987959928:stateMachine:production-applink-screen-state-machine", { "region": "us-west-2", "label": "Screen State Machine Execution Failed", "color": "#9467bd", "id": "m4" } ],
+                    [ "production.service.metrics", "production-lambda-hybrid-screen-processing-large-input-failure", "AppLinkFailures", "gauge", { "label": "screen-large-input-failure", "id": "m5", "visible": false } ],
+                    [ ".", "production-lambda-hybrid-audio-processing-medium-input-failure", ".", ".", { "label": "audio-medium-input-failure", "id": "m6", "visible": false } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 60,
+                "stat": "Sum",
+                "title": "Media flow errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 17,
+            "y": 68,
+            "width": 7,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [ "AWS/Lambda", "Errors", "FunctionName", "production-lambda-hybrid-recording-user-sync", { "label": "user-sync errors", "color": "#e377c2", "region": "us-west-2" } ],
+                    [ "...", "production-lambda-hybrid-recording-users-rate-limiter", { "label": "users-rate-limiter errors", "region": "us-west-2" } ],
+                    [ "production.service.metrics", "Reported.LambdaMetrics.lambda-hybrid-recording-users-rate-limiter.invalid-users-in-csv", "InvalidUsersInCSV", "gauge", { "label": "invalid-users-in-csv", "region": "us-west-2" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 60,
+                "stat": "Sum",
+                "title": "User flow errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 122,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-allocated-stats-available-ranges-critical",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-allocated-stats-available-ranges-critical"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 94,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-audio-default-general-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-audio-default-general-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 128,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-applink-contact-allocator-general-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-applink-contact-allocator-general-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 94,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-contact-id-producer-concurrent-execution-critical",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-contact-id-producer-concurrent-execution-critical"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 122,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-contact-injector-general-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-contact-injector-general-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 128,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-applink-kinesis-consumer-general-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-applink-kinesis-consumer-general-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 102,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-screen-large-duration-warning",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-screen-large-duration-warning"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 102,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-audio-large-general-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-audio-large-general-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 114,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-allocated-stats-general-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-allocated-stats-general-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 94,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-contact-id-producer-timeout-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-contact-id-producer-timeout-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 94,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-contact-id-producer-not-invoked-within-scheduled-time",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-contact-id-producer-not-invoked-within-scheduled-time"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 102,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-audio-large-Input-NMF-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-audio-large-Input-NMF-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 102,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-audio-medium-Input-NMF-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-audio-medium-Input-NMF-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 108,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-audio-default-Input-NMF-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-audio-default-Input-NMF-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 108,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-screen-processing-default-input-failure",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-screen-processing-default-input-failure"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 108,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-screen-large-input-failure",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-screen-large-input-failure"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 108,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-lambda-hybrid-recording-audio-medium-general-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-lambda-hybrid-recording-audio-medium-general-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 83,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# **Alarms**\n"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 100,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "### **Media Alarms - audio and screen**\n"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 84,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "### **Metadata Producer Alarms**\n"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 86,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-metadata-producer-concurrent-execution-critical",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-metadata-producer-concurrent-execution-critical"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 86,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-metadata-producer-internal-service-errors",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-metadata-producer-internal-service-errors"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 86,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-metadata-producer-DDB-deletion-fail",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-metadata-producer-DDB-deletion-fail"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 86,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-metadata-producer-timeout-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-metadata-producer-timeout-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 92,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "### **Additional Metadata Alarms**\n"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 120,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "### **Additional Media Alarms**\n"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 1,
+            "width": 24,
+            "height": 4,
+            "properties": {
+                "query": "SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/lambda/production-lambda-applink-metadata-producer\" | SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/lambda/production-lambda-mcr-px-segment-decorator-applink\" | fields @timestamp, @message, @logStream, @log\n\n| filter @message like \"Total records received from sqs : \" \nor strcontains(@message, \"One or more participants in interactionId:\") \nor strcontains(@message, \"One or more recordings in interactionId:\") \nor strcontains(@message, \"Received contacts with Interaction IDs:\") \nor strcontains(@message, \"Failed to push segment to SQS. Segment ID:\")\nor strcontains(@message, \"Injecting segments to SQS: SUCCESS COUNT: \")\nor strcontains(@message, \"Count of records successfully pushed to kinesis: \")\n\n| parse @message \"Injecting segments to SQS: SUCCESS COUNT: * \" as sent_to_sqs\n| parse @message \"Total records received from sqs : *\" as mcr_recieved_from_sqs\n| parse @message \"Count of records successfully pushed to kinesis: *\" as mcr_success_to_kinesis\n\n| stats\nsum(strcontains(@message, \"One or more participants in interactionId:\")) as participants_validation_error_count,\nsum(strcontains(@message, \"One or more recordings in interactionId:\")) as recording_validation_error_count,\nsum(strcontains(@message, \"Received contacts with Interaction IDs:\")) as received_files_count,\nsum(strcontains(@message, \"Failed to push segment to SQS. Segment ID:\")) as SQS_send_error_count,\nsum(sent_to_sqs) as success_id_sent_to_sqs,\nsum(mcr_recieved_from_sqs) as decoration_id_recieved_from_sqs,\nsum(mcr_success_to_kinesis) as decoration_id_upload_to_kinesis\n| sort @timestamp asc",
+                "region": "us-west-2",
+                "title": "Metadata Lambdas statistics",
+                "view": "table"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 51,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "# **Applink Audio State Machine - Overview**",
+                "background": "solid"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 136,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "ANOMALY_DETECTION_BAND(m2, 2)", "label": "Anomaly detection for Memory utilized", "id": "e1" } ],
+                    [ "ECS/ContainerInsights", "MemoryReserved", "ServiceName", "ms-hybrid-recording-storage-access-provider", "ClusterName", "production-hybrid-recording", { "color": "#d62728", "region": "us-west-2", "id": "m1" } ],
+                    [ ".", "MemoryUtilized", ".", ".", ".", ".", { "color": "#2ca02c", "region": "us-west-2", "id": "m2" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Maximum",
+                "period": 3600,
+                "title": "SAP Memory Reserved vs Utilized"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 136,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "ANOMALY_DETECTION_BAND(m2, 2)", "label": "Anomaly detection for CPU utilized", "id": "e1", "region": "us-west-2" } ],
+                    [ "ECS/ContainerInsights", "CpuReserved", "ServiceName", "ms-hybrid-recording-storage-access-provider", "ClusterName", "production-hybrid-recording", { "color": "#d62728", "region": "us-west-2", "id": "m1" } ],
+                    [ ".", "CpuUtilized", ".", ".", ".", ".", { "color": "#2ca02c", "region": "us-west-2", "id": "m2" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Maximum",
+                "period": 3600,
+                "title": "SAP CPU Reserved vs Utilized"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 142,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/ApplicationELB", "HTTPCode_Target_2XX_Count", "TargetGroup", "targetgroup/production-strgAccProvTG/247116225532ca37", "LoadBalancer", "app/production-AppLinkALB/065913d78bb6b812", { "label": "SAP 2XX", "id": "m1" } ],
+                    [ "AWS/ApplicationELB", "RequestCount", "TargetGroup", "targetgroup/production-strgAccProvTG/247116225532ca37", "LoadBalancer", "app/production-AppLinkALB/065913d78bb6b812", { "label": "SAP RequestCount", "id": "m2" } ],
+                    [ { "expression": "ANOMALY_DETECTION_BAND(m2, 2)", "label": "Anomaly detection for SAP RequestCount", "id": "e1" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "SAP load balancer",
+                "period": 60,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 53,
+            "width": 24,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/States", "ExecutionsStarted", "StateMachineArn", "arn:aws:states:us-west-2:918987959928:stateMachine:production-applink-audio-state-machine", { "region": "us-west-2", "label": "InputSegment", "id": "inputSegment", "period": 3600 } ],
+                    [ ".", "ExecutionsSucceeded", ".", ".", { "region": "us-west-2", "label": "outputSucceeded", "color": "#2ca02c", "id": "outputSucceeded", "period": 3600 } ],
+                    [ { "expression": "ANOMALY_DETECTION_BAND(outputSucceeded,0.8)", "label": "succeededAnomalies", "id": "succeededAnomalies", "region": "us-west-2", "color": "#2ca02c" } ],
+                    [ { "expression": "ANOMALY_DETECTION_BAND(inputSegment, 0.8)", "label": "inputsAnomalies", "id": "inputsAnomalies", "region": "us-west-2", "color": "#1f77b4" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "InputSegment - OutputSucceeded",
+                "period": 86400,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 150,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "IF(inputSegment > 0, 100 * (largeDelegation / inputSegment),0)", "label": "largeDelegationRatio", "id": "largeDelegationRatio", "region": "us-west-2", "color": "#ffbb78", "period": 3600 } ],
+                    [ { "expression": "ANOMALY_DETECTION_BAND(largeDelegationRatio, 0.8)", "label": "Anomalies", "id": "largeDelegationAnomalies", "region": "us-west-2", "period": 3600 } ],
+                    [ "AWS/States", "ExecutionsStarted", "StateMachineArn", "arn:aws:states:us-west-2:918987959928:stateMachine:production-applink-audio-state-machine", { "region": "us-west-2", "label": "inputSegment", "id": "inputSegment", "visible": false } ],
+                    [ "production.service.metrics", "production-applink-large-delegation", { "id": "largeDelegation", "region": "us-west-2", "label": "largeDelegation", "visible": false } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "Large Delegation",
+                "period": 3600,
+                "stat": "Sum",
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 100
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 150,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "IF(inputSegment > 0, 100 * (mediumDelegation / inputSegment),0)", "label": "mediumDelegationRatio", "id": "mediumDelegationRatio", "region": "us-west-2", "color": "#9467bd", "period": 3600 } ],
+                    [ { "expression": "ANOMALY_DETECTION_BAND(mediumDelegationRatio, 0.8)", "label": "Anomalies", "id": "mediumDelegationAnomalies", "region": "us-west-2", "period": 3600 } ],
+                    [ "AWS/States", "ExecutionsStarted", "StateMachineArn", "arn:aws:states:us-west-2:918987959928:stateMachine:production-applink-audio-state-machine", { "region": "us-west-2", "label": "inputSegment", "id": "inputSegment", "visible": false } ],
+                    [ "production.service.metrics", "production-applink-medium-delegation", { "id": "mediumDelegation", "region": "us-west-2", "label": "mediumDelegation", "visible": false } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "Medium Delegation",
+                "period": 3600,
+                "stat": "Sum",
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 100
+                    }
+                }
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 10,
+            "width": 24,
+            "height": 6,
+            "properties": {
+                "query": "SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/states/production-applink-audio-state-machine\" | fields @message\n| filter (details.name = \"LogInputSegmentPerTenantId\" and type = \"PassStateExited\") or (@message like \"Successfully processed recording.\" and type = \"TaskSucceeded\" )\n| parse details.output \"tenantId\\\":\\\"*\\\"\" as TenantId \n| filter ispresent(TenantId)\n| parse details.output \"@InputSegment@\" as Input\n| parse details.output \"Successfully processed recording.\" as Output\n| parse details.output \"tenantName\\\":\\\"*\\\"\" as tenantName\n| parse details.output \"slaTimeInMilliseconds\\\":*,\" as slaTime\n| stats sortsFirst(tenantName) as TenantName, count(Input) as InputSegments, count(Output) as SuccessSegments, avg(slaTime) / 60000 as Average_SLA_Minutes, concat(round((Average_SLA_Minutes / 60 * 100), 0), \"%\") as Relative_to_target_SLA_1_hr by TenantId",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Input / Success",
+                "view": "table"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 134,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "# **Storage Access Provider**"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 114,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-applink-audio-state-machine-failure-error",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:918987959928:alarm:production-applink-audio-state-machine-failure-error"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 9,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# **Applink Audio State Machine - Per Tenant**",
+                "background": "solid"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 148,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "# **Applink Audio State Machine - Delegation**",
+                "background": "solid"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 16,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# **Applink Metadata Processing Statistics**"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 17,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ "production.service.metrics", "production-missed-calls-lambda-number-of-valid-segments-received-from-DEF", "AppLink", "missed-calls-lambda", { "id": "m1", "label": "missed-calls-lambda-number-of-valid-segments-received-from-DEF", "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-number-of-segments-received-from-metadata-producer", ".", ".", { "id": "m2", "region": "us-west-2", "label": "missed-calls-segments-sent-to-SQS", "visible": false } ],
+                    [ "production.service.metrics", "production-metadata-producer-number-of-valid-segments-received-from-DEF", "AppLink", "metadata-producer", { "region": "us-west-2", "label": "metadata-producer-valid-segments-received-from-DEF", "id": "m3", "visible": false } ],
+                    [ ".", "production-metadata-producer-number-of-segments-received-from-metadata-producer", ".", ".", { "region": "us-west-2", "label": "metadata-producer-segments-sent-to-SQS", "id": "m4", "visible": false } ],
+                    [ ".", "production-metadata-producer-batch-size-information", ".", "metadata-producer", { "region": "us-west-2", "label": "metadata-producer-all-segments-received-from-DEF", "id": "m5", "color": "#2ca02c" } ],
+                    [ "production-lambda-mcr-px-segment-decorator-applink", "Reported.lambda-mcr-px-segment-decorator-applink.FAILED_WRITE_TO_KINESIS_COUNT", "type", "gauge", { "id": "m6", "label": "decoration-lambda-number-of-failed-segments-submitted-to-kinesis", "region": "us-west-2", "visible": false } ],
+                    [ { "expression": "SUM([m3,m1])", "label": "number-of-valid-segments-received-from-DEF", "id": "e1", "region": "us-west-2", "color": "#8c564b" } ],
+                    [ { "expression": "SUM([m2,m4])", "label": "number-of-segments-sent-to-SQS", "id": "e2", "region": "us-west-2", "color": "#e377c2" } ],
+                    [ { "expression": "ANOMALY_DETECTION_BAND(m5, 2)", "label": "anomaly-detection-all-segments-received-from-DEF", "id": "e3", "region": "us-west-2", "color": "#d62728" } ],
+                    [ { "expression": "e2 - m6", "label": "decoration-lambda-submitted-segments-to-Kinesis", "id": "e4", "region": "us-west-2", "color": "#bcbd22" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Interactions processing statistics"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 17,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ "production.service.metrics", "production-metadata-producer-number-of-duplicate-segments-received-from-DEF", "AppLink", "metadata-producer", { "label": "number-of-duplicate-segments-received-from-DEF", "region": "us-west-2", "id": "m1", "visible": false } ],
+                    [ ".", "production-metadata-producer-number-of-invalid-segments-received-from-DEF", ".", ".", { "label": "number-of-invalid-segments-received-from-DEF", "region": "us-west-2", "id": "m2", "visible": false } ],
+                    [ ".", "production-metadata-producer-number-of-segments-received-from-metadata-producer", ".", ".", { "region": "us-west-2", "label": "metadata-producer-segments-sent-to-SQS", "id": "m3", "visible": false } ],
+                    [ ".", "production-missed-calls-lambda-filtered-calls-due-to-time-range-information", ".", "missed-calls-lambda", { "label": "missed-calls-filtered-out", "id": "m4", "color": "#d62728", "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-number-of-duplicate-segments-received-from-DEF", ".", ".", { "label": "missed-calls-number-of-duplicate-segments-received-from-DEF", "id": "m5", "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-number-of-invalid-segments-received-from-DEF", ".", ".", { "label": "missed-calls-number-of-invalid-segments-received-from-DEF", "id": "m6", "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-number-of-segments-received-from-metadata-producer", ".", ".", { "id": "m7", "region": "us-west-2", "label": "missed-calls-segments-sent-to-SQS", "visible": false } ],
+                    [ ".", "production-metadata-producer-without-OsLogin-failure", ".", ".", { "id": "m8", "region": "us-west-2", "color": "#7f7f7f" } ],
+                    [ ".", "production-metadata-producer-teamID-not-found-failure", ".", ".", { "id": "m9", "region": "us-west-2", "color": "#bcbd22" } ],
+                    [ "production-lambda-mcr-px-segment-decorator-applink", "Reported.lambda-mcr-px-segment-decorator-applink.FAILED_WRITE_TO_KINESIS_COUNT", "type", "gauge", { "id": "m10", "region": "us-west-2", "label": "decoration-lambda-number-of-failed-segments-submitted-to-kinesis", "visible": false } ],
+                    [ { "expression": "SUM([m1,m5])", "label": "number-of-duplicate-segments-received-from-DEF", "id": "e1", "region": "us-west-2", "color": "#1f77b4" } ],
+                    [ { "expression": "SUM([m2,m6])", "label": "number-of-invalid-segments-received-from-DEF", "id": "e2", "region": "us-west-2", "color": "#ff7f0e" } ],
+                    [ { "expression": "SUM([m3,m7])", "label": "number-of-segments-sent-to-SQS", "id": "e3", "region": "us-west-2", "visible": false } ],
+                    [ { "expression": "e3 - m10", "label": "decoration-lambda-submitted-segments-to-Kinesis", "id": "e4", "region": "us-west-2", "color": "#2ca02c" } ]
+                ],
+                "view": "pie",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 604800,
+                "title": "Interactions processing distribution diagram",
+                "setPeriodToTimeRange": true
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 24,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ "production.service.metrics", "production-metadata-producer-number-of-old-segments-received-from-DEF", "AppLink", "metadata-producer", { "label": "number-of-old-segments-received-from-DEF" } ],
+                    [ "production.service.metrics", "production-metadata-producer-number-of-new-segments-received-from-DEF", ".", ".", { "label": "number-of-new-segments-received-from-DEF" } ]
+                ],
+                "view": "pie",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 86400,
+                "title": "Old calls vs new calls"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 24,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ "production.service.metrics", "production-missed-calls-lambda-number-of-segments-received-from-metadata-producer", "AppLink", "missed-calls-lambda", { "id": "m1", "region": "us-west-2", "label": "missed-calls-segments-sent-to-SQS", "visible": false } ],
+                    [ "production.service.metrics", "production-metadata-producer-number-of-segments-received-from-metadata-producer", "AppLink", "metadata-producer", { "region": "us-west-2", "label": "metadata-producer-segments-sent-to-SQS", "id": "m2", "visible": false } ],
+                    [ "production-lambda-mcr-px-segment-decorator-applink", "Reported.lambda-mcr-px-segment-decorator-applink.FAILED_WRITE_TO_KINESIS_COUNT", "type", "gauge", { "id": "m3", "label": "decoration-lambda-number-of-failed-segments-submitted-to-kinesis", "region": "us-west-2", "visible": false } ],
+                    [ { "expression": "SUM([m1,m2])", "label": "number-of-segments-sent-to-SQS", "id": "e1", "region": "us-west-2", "visible": false } ],
+                    [ { "expression": "e1 - m3", "label": "decoration-lambda-submitted-segments-to-Kinesis", "id": "e2", "region": "us-west-2", "color": "#1f77b4" } ],
+                    [ { "expression": "ANOMALY_DETECTION_BAND(e2, 2)", "label": "anomaly-detection-number-of-segments-submitted-to-Kinesis", "id": "e3", "region": "us-west-2" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Sum",
+                "title": "Decoration lambda number of segments submitted to Kinesis"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 5,
+            "width": 24,
+            "height": 4,
+            "properties": {
+                "query": "SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/states/production-applink-audio-state-machine\" | SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/vendedlogs/states/production-applink-screen-state-machine\" | | stats\nsum(strcontains(type, \"ExecutionSucceeded\") and strcontains(@log,\"applink-audio-state-machine\")) as audio_success,\nsum(strcontains(type, \"ExecutionFailed\") and strcontains(@log,\"applink-audio-state-machine\")) as audio_failure,\nconcat(round((sum(strcontains(type, \"ExecutionSucceeded\") and strcontains(@log,\"applink-audio-state-machine\")) * 10000.0) / (sum(strcontains(type, \"ExecutionSucceeded\") and strcontains(@log,\"applink-audio-state-machine\")) + sum(strcontains(type, \"ExecutionFailed\") and strcontains(@log,\"applink-audio-state-machine\")))) / 100, \"%\") as audio_success_rate,\nsum(strcontains(type, \"ExecutionSucceeded\") and strcontains(@log,\"applink-screen-state-machine\")) as screen_success,\nsum(strcontains(type, \"ExecutionFailed\") and strcontains(@log,\"applink-screen-state-machine\")) as screen_failure,\nconcat(round((sum(strcontains(type, \"ExecutionSucceeded\") and strcontains(@log,\"applink-screen-state-machine\")) * 10000.0) / (sum(strcontains(type, \"ExecutionSucceeded\") and strcontains(@log,\"applink-screen-state-machine\")) + sum(strcontains(type, \"ExecutionFailed\") and strcontains(@log,\"applink-screen-state-machine\")))) / 100, \"%\") as screen_success_rate",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Media State Machine Statistics",
+                "view": "table"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 31,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "ANOMALY_DETECTION_BAND(m1, 2)", "label": "sap-request-anomaly-detection", "id": "e1" } ],
+                    [ "production.service.metrics", "sap-url-requested-for-metadata", "AppLink", "storage-access-provider", { "region": "us-west-2", "label": "sap-url-requested-for-metadata", "id": "m1", "color": "#1f77b4" } ],
+                    [ ".", "production-metadata-producer-number-of-new-metadata-files-received-from-DEF", ".", "metadata-producer", { "region": "us-west-2", "label": "metadata producer received new metadata files from DEF", "id": "m2", "color": "#2ca02c" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "SAP URLs requested vs metadata producer calls",
+                "period": 300,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 31,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ "production.service.metrics", "production-lambda-hybrid-recording-contact-id-producer-success-without-allocator-lambda", "AppLink", "contact-id-producer-lambda", { "label": "success-without-allocator-lambda" } ],
+                    [ "production.service.metrics", "production-lambda-hybrid-recording-contact-id-producer-allocator-lambda-invocation-success", "AppLink", "contact-id-producer-lambda", { "label": "allocator-lambda-invocation-success" } ],
+                    [ "production.service.metrics", "production-lambda-hybrid-recording-contact-id-producer-allocator-lambda-invocation-failure", "AppLink", "contact-id-producer-lambda", { "label": "allocator-lambda-invocation-failure" } ],
+                    [ "AWS/Lambda", "Invocations", "FunctionName", "production-lambda-hybrid-recording-contact-id-producer", { "region": "us-west-2", "color": "#9467bd" } ],
+                    [ ".", "Errors", ".", ".", { "region": "us-west-2", "color": "#d62728" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "contact id producer statistics"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 38,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ { "expression": "SUM([m4,m5])", "label": "Duplicated segments", "id": "e1", "region": "us-west-2" } ],
+                    [ { "expression": "SUM([m6,m7])", "label": "Segments missing audio", "id": "e2", "region": "us-west-2" } ],
+                    [ { "expression": "SUM([m8,m9])", "label": "User resolution failures", "id": "e3", "region": "us-west-2" } ],
+                    [ "production.service.metrics", "production-missed-calls-lambda-batch-size-information", "AppLink", "missed-calls-lambda", { "region": "us-west-2", "label": "missed-calls-lambda-batch-size", "id": "m1", "color": "#17becf" } ],
+                    [ ".", "production-metadata-producer-number-of-old-segments-received-from-DEF", ".", "metadata-producer", { "label": "old-calls-in-metadata-producer", "region": "us-west-2", "id": "m2" } ],
+                    [ ".", "production-missed-calls-lambda-filtered-calls-due-to-time-range-information", ".", "missed-calls-lambda", { "label": "missed-calls-lambda-filtered-out-of-range-calls", "region": "us-west-2", "id": "m3" } ],
+                    [ ".", "production-missed-calls-lambda-number-of-duplicate-segments-received-from-DEF", ".", ".", { "visible": false, "id": "m4", "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-number-of-duplicate-segments-received-from-DEF", ".", "metadata-producer", { "visible": false, "id": "m5", "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-number-of-segments-missing-audio", ".", ".", { "id": "m6", "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-missed-calls-lambda-number-of-segments-missing-audio", ".", ".", { "id": "m7", "visible": false, "region": "us-west-2" } ],
+                    [ ".", "production-metadata-producer-without-OsLogin-failure", ".", ".", { "id": "m8", "region": "us-west-2", "visible": false } ],
+                    [ ".", "production-missed-calls-lambda-without-OsLogin-failure", ".", ".", { "id": "m9", "region": "us-west-2", "visible": false } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 300,
+                "title": "Interactions processing discrepancies",
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 38,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [ "production.service.metrics", "production-metadata-producer-received-empty-event", "AppLink", "metadata-producer", { "label": "received-empty-event" } ],
+                    [ "production.service.metrics", "production-metadata-producer-invalid-json-format", ".", ".", { "label": "invalid-json-format" } ],
+                    [ "production.service.metrics", "production-metadata-producer-received-empty-json-from-DEF", ".", ".", { "label": "received-empty-json-from-DEF" } ],
+                    [ "production.service.metrics", "production-metadata-producer-s3-fetch-error", ".", ".", { "label": "s3-fetch-error" } ],
+                    [ "production.service.metrics", "production-metadata-producer-invalid-input-event", ".", ".", { "label": "invalid-input-event" } ]
+                ],
+                "view": "pie",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "invalid event format errors"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 61,
+            "width": 10,
+            "height": 6,
+            "properties": {
+                "query": "SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/lambda/production-lambda-hybrid-recording-allocated-stats\" | fields @message\n| filter @message like \"updated total_available_rows\"\n| parse @message \"to *. total rows: *\" as available, Total_Ranges\n| stats min(available) as Available, min(Total_Ranges) - min(available) as Consumed, count() as Consumed_At_Period by Total_Ranges\n| display Total_Ranges, Available, Consumed, Consumed_At_Period, concat(round((Available / Total_Ranges) * 100, 2),\"%\") as Remaining_Ranges_Percent | limit 10",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Contact Id Ranges Consumption Report (1 Range = 1M Contact IDs)",
+                "view": "table"
+            }
+        },
+        {
+            "type": "log",
+            "x": 10,
+            "y": 61,
+            "width": 7,
+            "height": 6,
+            "properties": {
+                "query": "SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/lambda/production-lambda-applink-contact-allocator\" | fields @message \n| filter @message like \"Received event\"\n| parse @message /\\\\?\"id\\\\?\":\\\\?\"(?<Consumer_Name>[^\"\\\\?]+)\\\\?\"/\n| stats sum(strcontains(@message, \"Received event\")) as Consumption by Consumer_Name",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Contact Id Ranges Consumption by Product (1 Range = 1M Contact IDs)",
+                "view": "pie"
+            }
+        },
+        {
+            "type": "log",
+            "x": 17,
+            "y": 61,
+            "width": 7,
+            "height": 6,
+            "properties": {
+                "query": "SOURCE \"arn:aws:logs:us-west-2:918987959928:log-group:/aws/lambda/production-lambda-applink-contact-allocator\" | fields @message \n| filter @message like \"Received event\"\n| parse @message /\\\\?\"id\\\\?\":\\\\?\"(?<Product>[^\"\\\\?]+)\\\\?\"/\n| stats sum(strcontains(@message, \"Received event\")) as Ranges_Consumed_at_Period by Product",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Contact Id Ranges Consumption by Product  (1 Range = 1M Contact IDs)",
+                "view": "table"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 45,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "AWS/ApplicationELB", "HTTPCode_Target_3XX_Count", "TargetGroup", "targetgroup/production-strgAccProvTG/247116225532ca37", "LoadBalancer", "app/production-AppLinkALB/065913d78bb6b812", { "label": "SAP 3XX", "id": "m1", "region": "us-west-2", "color": "#1f77b4" } ],
+                    [ "AWS/ApplicationELB", "HTTPCode_Target_4XX_Count", "TargetGroup", "targetgroup/production-strgAccProvTG/247116225532ca37", "LoadBalancer", "app/production-AppLinkALB/065913d78bb6b812", { "label": "SAP 4XX", "id": "m2", "region": "us-west-2", "color": "#ff7f0e" } ],
+                    [ "AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "TargetGroup", "targetgroup/production-strgAccProvTG/247116225532ca37", "LoadBalancer", "app/production-AppLinkALB/065913d78bb6b812", { "label": "SAP 5XX", "id": "m3", "region": "us-west-2", "color": "#d62728" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "SAP - 3XX/4XX/5XX HTTP codes",
+                "period": 60,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 67,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# **General Erros**\n"
+            }
+        }
+    ]
+}

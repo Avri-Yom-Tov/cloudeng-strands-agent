@@ -6,7 +6,8 @@ from strands_tools import use_aws
 
 import os
 import sys
-import atexit
+import json
+from pathlib import Path
 from typing import Dict
 
 # Import AWS configuration
@@ -20,8 +21,77 @@ PREDEFINED_TASKS = {
     "recent_logs": "Get recent CloudWatch logs for a specific resource",
     "error_analysis": "Analyze error patterns in the last hour",
     "performance_metrics": "Get performance metrics for Lambda functions",
-    "invocation_trends": "Analyze invocation trends over time"
+    "invocation_trends": "Analyze invocation trends over time",
+    "daily_report": "Generate AppLink Daily Report (US-WEST-2 & EU-WEST-2)"
 }
+
+def load_dashboard_widgets() -> str:
+    """Load and parse the dashboard JSON to extract widgets"""
+    try:
+        # Locate dashboard file relative to this script
+        base_path = Path(__file__).resolve().parent.parent
+        dashboard_path = base_path / "dashboard" / "applinkProd.json"
+        
+        if not dashboard_path.exists():
+            return f"Error: Dashboard file not found at {dashboard_path}"
+            
+        with open(dashboard_path, 'r', encoding='utf-8') as f:
+            dashboard_data = json.load(f)
+            
+        # Extract only widgets to reduce token count
+        widgets = dashboard_data.get('widgets', [])
+        
+        # Create a simplified representation of widgets
+        simplified_widgets = []
+        for widget in widgets:
+            if widget.get('type') in ['log', 'metric']:
+                simplified_widgets.append(widget)
+                
+        return json.dumps({"widgets": simplified_widgets}, indent=2)
+    except Exception as e:
+        return f"Error loading dashboard: {str(e)}"
+
+def prepare_daily_report_prompt() -> str:
+    """Load the daily report prompt and append dashboard data"""
+    try:
+        # Locate prompt file relative to this script
+        base_path = Path(__file__).resolve().parent.parent
+        prompt_path = base_path / "prompts" / "appLinkDailyReport.md"
+        
+        if not prompt_path.exists():
+            return "Error: Prompt file not found."
+            
+        with open(prompt_path, 'r', encoding='utf-8') as f:
+            prompt_content = f.read()
+            
+        # Remove frontmatter if present (between --- and ---)
+        if prompt_content.startswith('---'):
+            parts = prompt_content.split('---', 2)
+            if len(parts) >= 3:
+                prompt_content = parts[2].strip()
+        
+        # Load dashboard data
+        dashboard_json = load_dashboard_widgets()
+        
+        # Append dashboard data to the prompt
+        full_prompt = f"""{prompt_content}
+
+---
+
+## 📊 DASHBOARD DATA SOURCE (PARSED)
+
+The following JSON contains the widgets from `applink-prod-dashboard.json`. 
+Use this data structure to execute the required queries.
+
+```json
+{dashboard_json}
+```
+
+**EXECUTE THE MISSION NOW.**
+"""
+        return full_prompt
+    except Exception as e:
+        return f"Error preparing daily report prompt: {str(e)}"
 
 # Initialize MCP clients (will be done once in Streamlit session state)
 time_mcp_client = None
@@ -196,7 +266,12 @@ def execute_predefined_task(task_key: str, conversation_history=None) -> tuple:
         error_msg = f"Error: Task '{task_key}' not found in predefined tasks."
         return error_msg, conversation_history or []
     
-    task_description = PREDEFINED_TASKS[task_key]
+    if task_key == "daily_report":
+        # Special handling for daily report to inject full context
+        task_description = prepare_daily_report_prompt()
+    else:
+        task_description = PREDEFINED_TASKS[task_key]
+        
     return execute_custom_task(task_description, conversation_history)
 
 # Function to execute a custom task
@@ -269,6 +344,22 @@ if __name__ == "__main__":
     
     st.title("🔧 AWS Production Support")
     
+    # Add sidebar for predefined tasks
+    with st.sidebar:
+        st.header("Predefined Tasks")
+        for task_key, task_desc in PREDEFINED_TASKS.items():
+            # Special styling for Daily Report
+            if task_key == "daily_report":
+                if st.button(f"📊 {task_desc}", key=task_key, type="primary"):
+                    st.session_state.messages.append({"role": "user", "content": f"Generate AppLink Daily Report"})
+                    st.session_state.pending_task = task_key
+                    st.rerun()
+            else:
+                if st.button(task_desc, key=task_key):
+                    st.session_state.messages.append({"role": "user", "content": task_desc})
+                    st.session_state.pending_task = task_key
+                    st.rerun()
+    
     # Initialize MCP clients only once
     if "mcp_initialized" not in st.session_state:
         with st.spinner("Initializing MCP clients..."):
@@ -292,6 +383,25 @@ if __name__ == "__main__":
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+            
+    # Handle pending tasks from sidebar
+    if "pending_task" in st.session_state and st.session_state.pending_task:
+        task_key = st.session_state.pending_task
+        del st.session_state.pending_task
+        
+        with st.chat_message("assistant"):
+            with st.spinner("🔍 Analyzing production data..."):
+                response, updated_agent_messages = execute_predefined_task(
+                    task_key, 
+                    conversation_history=st.session_state.agent_messages
+                )
+                cleaned_response = clean_response(response)
+                st.markdown(cleaned_response)
+        
+        # Update both histories
+        st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
+        st.session_state.agent_messages = updated_agent_messages
+        st.rerun()
     
     # Handle new user input
     if prompt := st.chat_input("Ask about production metrics..."):
@@ -316,7 +426,4 @@ if __name__ == "__main__":
         st.session_state.agent_messages = updated_agent_messages
         
         st.rerun()
-
-
-
 

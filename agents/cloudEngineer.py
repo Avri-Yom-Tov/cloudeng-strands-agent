@@ -215,3 +215,4 @@ if __name__ == "__main__":
     # Example usage
     result = execute_custom_task("List all EC2 instances and their status")
     print(result)
+

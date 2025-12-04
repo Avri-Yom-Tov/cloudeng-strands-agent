@@ -98,9 +98,9 @@ You can run the application in two ways:
    streamlit run app.py
    ```
 
-2. **Direct execution** (if you want to run cloudEngineerAgent.py directly)
+2. **Direct execution** (if you want to run agents/cloudEngineer.py directly)
    ```
-   python cloudEngineerAgent.py
+   python -m agents.cloudEngineer
    ```
 
 #### Windows Configuration
@@ -242,7 +242,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Important Update for Windows Users
 
-The code has been updated to handle the issue with running `cloudEngineerAgent.py` directly on Windows. The following changes have been made:
+The code has been updated to handle the issue with running `agents/cloudEngineer.py` directly on Windows. The following changes have been made:
 
 1. Added robust error handling for MCP client initialization
 2. Implemented a fallback mechanism when MCP tools are not available
@@ -259,12 +259,12 @@ The recommended way to run the application is still using Streamlit:
 streamlit run app.py
 ```
 
-### Option 2: Running cloudEngineerAgent.py Directly
+### Option 2: Running agents/cloudEngineer.py Directly
 
-You can now run the cloudEngineerAgent.py script directly:
+You can now run the agents/cloudEngineer.py script directly:
 
 ```
-python cloudEngineerAgent.py
+python -m agents.cloudEngineer
 ```
 
 The script will:
@@ -308,12 +308,12 @@ If you continue to experience issues, please provide:
 
 
 
-set AWS_REGION=us-west-2&& python cloudEngineerAgent.py
+set AWS_REGION=us-west-2&& python -m agents.cloudEngineer
 streamlit run app.py
 
 
 
-streamlit run prodSupportAgent.py
+streamlit run agents.prodSupport
 
 How many invocations were there in the last 5 hour for Lambda production-lambda-hybrid-recording-user-sync and were there any failures
 
