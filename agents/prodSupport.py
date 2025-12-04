@@ -20,6 +20,11 @@ import streamlit as st
 
 import boto3
 
+from datetime import datetime
+import json
+import re
+from collections import Counter
+
 
 
 # Import AWS configuration
@@ -94,6 +99,181 @@ def cleanup_mcp_clients():
     print("MCP clients cleanup completed.")
 
 atexit.register(cleanup_mcp_clients)
+
+def analyze_dashboard_patterns(dashboard_path='dashboard/applink.json'):
+    """Analyze CloudWatch dashboard to extract naming patterns for Lambda functions and resources"""
+    try:
+        with open(dashboard_path, 'r', encoding='utf-8') as f:
+            dashboard = json.load(f)
+        
+        lambda_names = []
+        log_groups = []
+        state_machines = []
+        metrics_namespaces = set()
+        
+        # Extract all Lambda function names and patterns from dashboard
+        dashboard_str = json.dumps(dashboard)
+        
+        # Find Lambda function names in FunctionName properties
+        lambda_pattern = r'"FunctionName"\s*,\s*"([^"]+)"'
+        lambda_names.extend(re.findall(lambda_pattern, dashboard_str))
+        
+        # Find log groups
+        log_group_pattern = r'/aws/lambda/([^"]+)'
+        log_groups.extend(re.findall(log_group_pattern, dashboard_str))
+        
+        # Find state machines
+        state_machine_pattern = r'stateMachine:([^"]+)'
+        state_machines.extend(re.findall(state_machine_pattern, dashboard_str))
+        
+        # Find metric namespaces
+        namespace_pattern = r'"([^"]*\.service\.metrics)"'
+        metrics_namespaces.update(re.findall(namespace_pattern, dashboard_str))
+        
+        # Analyze patterns
+        all_lambda_names = list(set(lambda_names + log_groups))
+        
+        # Find common prefixes
+        if all_lambda_names:
+            prefix_counter = Counter()
+            for name in all_lambda_names:
+                # Check for common prefixes
+                parts = name.split('-')
+                for i in range(1, min(4, len(parts) + 1)):
+                    prefix = '-'.join(parts[:i]) + '-'
+                    prefix_counter[prefix] += 1
+            
+            # Get most common prefix (appears in >50% of names)
+            common_prefixes = [prefix for prefix, count in prefix_counter.items() 
+                             if count > len(all_lambda_names) * 0.5]
+            common_prefixes.sort(key=len, reverse=True)
+            lambda_prefix = common_prefixes[0] if common_prefixes else 'production-lambda-'
+        else:
+            lambda_prefix = 'production-lambda-'
+        
+        # Analyze state machine pattern
+        state_machine_prefix = 'production-'
+        if state_machines:
+            # Most state machines start with production-
+            for sm in state_machines:
+                if sm.startswith('production-'):
+                    state_machine_prefix = 'production-'
+                    break
+        
+        result = {
+            'lambda_prefix': lambda_prefix,
+            'lambda_log_group_prefix': f'/aws/lambda/{lambda_prefix}',
+            'state_machine_prefix': state_machine_prefix,
+            'metrics_namespaces': list(metrics_namespaces),
+            'sample_lambdas': all_lambda_names[:10],
+            'sample_state_machines': state_machines[:5],
+            'total_lambdas_found': len(all_lambda_names)
+        }
+        
+        return result
+        
+    except Exception as e:
+        print(f"Warning: Could not analyze dashboard patterns: {e}")
+        # Return defaults
+        return {
+            'lambda_prefix': 'production-lambda-',
+            'lambda_log_group_prefix': '/aws/lambda/production-lambda-',
+            'state_machine_prefix': 'production-',
+            'metrics_namespaces': [],
+            'sample_lambdas': [],
+            'sample_state_machines': [],
+            'total_lambdas_found': 0
+        }
+
+atexit.register(cleanup_mcp_clients)
+
+def create_logging_wrapper(tool):
+    """Wrap an MCP tool to log all calls with parameters"""
+    
+    # Get the original tool's name
+    tool_name = (
+        getattr(tool, 'name', None) or 
+        getattr(tool, '_name', None) or 
+        getattr(tool, 'tool_name', None) or
+        getattr(getattr(tool, '_tool', None), 'name', None) or
+        getattr(getattr(tool, 'tool', None), 'name', None) or
+        "Unknown tool"
+    )
+    
+    # Wrap the 'stream' method which is how Strands calls MCP tools
+    if hasattr(tool, 'stream'):
+        original_stream = tool.stream
+        
+        def logged_stream(arguments, *args, **kwargs):
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            print(f"\n{'='*80}")
+            print(f"[{timestamp}] 🔧 MCP TOOL STREAM CALL: {tool_name}")
+            print(f"{'='*80}")
+            print(f"📥 Arguments: {arguments}")
+            if args:
+                print(f"📥 Additional Args: {args}")
+            if kwargs:
+                print(f"📥 Kwargs:")
+                for key, value in kwargs.items():
+                    print(f"   - {key}: {value}")
+            print(f"{'='*80}\n")
+            
+            result = original_stream(arguments, *args, **kwargs)
+            return result
+        
+        tool.stream = logged_stream
+    
+    # Try to wrap the actual MCP tool's call_tool method
+    if hasattr(tool, 'mcp_tool') and tool.mcp_tool:
+        mcp_tool = tool.mcp_tool
+        if hasattr(mcp_tool, '__call__'):
+            original_mcp_call = mcp_tool.__call__
+            
+            def logged_mcp_call(*args, **kwargs):
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                print(f"\n{'='*80}")
+                print(f"[{timestamp}] 🔧 MCP TOOL CALL: {tool_name}")
+                print(f"{'='*80}")
+                
+                if args:
+                    print(f"📥 Args: {args}")
+                if kwargs:
+                    print(f"📥 Kwargs:")
+                    for key, value in kwargs.items():
+                        print(f"   - {key}: {value}")
+                
+                print(f"{'='*80}\n")
+                
+                result = original_mcp_call(*args, **kwargs)
+                return result
+            
+            mcp_tool.__call__ = logged_mcp_call
+    
+    # Also try wrapping the tool's own __call__ if it has one
+    if hasattr(tool, '__call__'):
+        original_tool_call = tool.__call__
+        
+        def logged_tool_call(*args, **kwargs):
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            print(f"\n{'='*80}")
+            print(f"[{timestamp}] 🔧 TOOL __CALL__: {tool_name}")
+            print(f"{'='*80}")
+            
+            if args:
+                print(f"📥 Args: {args}")
+            if kwargs:
+                print(f"📥 Kwargs:")
+                for key, value in kwargs.items():
+                    print(f"   - {key}: {value}")
+            
+            print(f"{'='*80}\n")
+            
+            result = original_tool_call(*args, **kwargs)
+            return result
+        
+        tool.__call__ = logged_tool_call
+    
+    return tool
 
 def initialize_mcp_clients(aws_profile='wfoprod'):
 
@@ -234,7 +414,9 @@ def initialize_mcp_clients(aws_profile='wfoprod'):
 
         cloudwatch_tools = cloudwatch_mcp_client.list_tools_sync()
 
-
+        # Wrap tools with logging
+        # time_tools = [create_logging_wrapper(tool) for tool in time_tools]
+        cloudwatch_tools = [create_logging_wrapper(tool) for tool in cloudwatch_tools]
 
         print(f"Available Time tools: {len(time_tools)} tools loaded")
 
@@ -343,18 +525,55 @@ def get_bedrock_model():
     )
 
     
+    # Wrap the model's completion method to log tool calls
+    if hasattr(bedrock_model, 'completion'):
+        original_completion = bedrock_model.completion
+        
+        def logged_completion(*args, **kwargs):
+            # Check if there are tool calls in the response
+            result = original_completion(*args, **kwargs)
+            
+            # Try to detect tool usage in the result
+            if hasattr(result, 'stop_reason') and result.stop_reason == 'tool_use':
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                print(f"\n{'='*80}")
+                print(f"[{timestamp}] 🤖 LLM REQUESTING TOOL USE")
+                print(f"{'='*80}")
+                
+                if hasattr(result, 'content'):
+                    for content_block in result.content:
+                        if hasattr(content_block, 'type') and content_block.type == 'tool_use':
+                            print(f"🔧 Tool: {content_block.name}")
+                            print(f"📥 Input:")
+                            for key, value in content_block.input.items():
+                                print(f"   - {key}: {value}")
+                            print(f"{'='*80}\n")
+            
+            return result
+        
+        bedrock_model.completion = logged_completion
+    
 
     return bedrock_model
 
 
 
-def get_system_prompt():
+def get_system_prompt(dashboard_path='dashboard/applink.json'):
 
-    """Get system prompt for the agent"""
+    """Get system prompt for the agent with dynamic patterns from dashboard"""
 
     global time_tools, cloudwatch_tools
 
     
+
+    # Analyze dashboard to extract naming patterns
+    patterns = analyze_dashboard_patterns(dashboard_path)
+    
+    print(f"\n📊 Dashboard Analysis Results:")
+    print(f"  - Lambda prefix: {patterns['lambda_prefix']}")
+    print(f"  - Total Lambdas found: {patterns['total_lambdas_found']}")
+    print(f"  - Sample Lambdas: {patterns['sample_lambdas'][:3]}")
+    print()
 
     # Build tool list
 
@@ -459,12 +678,86 @@ def get_system_prompt():
     tool_list += "=" * 80 + "\n\n"
 
     
-
+    # Build examples from actual dashboard
+    lambda_examples = ""
+    if patterns['sample_lambdas']:
+        sample_names = patterns['sample_lambdas'][:3]
+        lambda_examples = "\n   Real examples from your infrastructure:\n"
+        for name in sample_names:
+            # Extract the short name (without prefix)
+            short_name = name.replace(patterns['lambda_prefix'], '')
+            lambda_examples += f"   - '{short_name}' → '{patterns['lambda_log_group_prefix']}{short_name}'\n"
+    
     return f"""You are an AWS Production Support Engineer for Account {AWS_PROFILE_FOR_TOOLS} (wfoprod) in {AWS_REGION}.
 
 You have tools available to query CloudWatch metrics and logs. Use them to get actual data.
 
 {tool_list}
+
+CRITICAL - LAMBDA FUNCTION NAMING CONVENTION:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This account uses a SPECIFIC naming pattern discovered from the dashboard:
+
+1. Lambda Log Groups Pattern:
+   - ALL Lambda log groups start with: {patterns['lambda_log_group_prefix']}
+   - When user mentions a Lambda function, ALWAYS add this prefix!
+   {lambda_examples}
+
+2. Lambda Metrics Pattern:
+   - For CloudWatch Metrics (get_metric_data), use namespace "AWS/Lambda"
+   - FunctionName dimension should be: {patterns['lambda_prefix']}<function-name>
+   - Example: FunctionName = "{patterns['lambda_prefix']}hybrid-recording-audio"
+
+3. Search Strategy:
+   a) First attempt: Use FULL name with prefix {patterns['lambda_log_group_prefix']}<name>
+   b) If not found: Try broader search with partial name
+   c) If still not found: List all with prefix "{patterns['lambda_log_group_prefix']}"
+   d) Help user identify the correct function from the list
+
+4. State Machines:
+   - State machines use prefix: {patterns['state_machine_prefix']}
+   - Example: "arn:aws:states:{AWS_REGION}:*:stateMachine:{patterns['state_machine_prefix']}<name>"
+
+⚠️  NEVER assume function names without the prefix!
+⚠️  ALWAYS add "{patterns['lambda_prefix']}" before Lambda function names!
+⚠️  If unsure, list available functions first!
+
+CRITICAL - TIME AND DATE HANDLING:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  ALWAYS use get_current_time FIRST before ANY time-based queries!
+⚠️  NEVER assume or hardcode dates - they will be wrong!
+
+Today's date is: {datetime.now().strftime('%B %d, %Y')} (December 4, 2025)
+
+When user asks about time ranges (e.g., "last 32 days", "last week"):
+1. FIRST call get_current_time with timezone 'UTC'
+2. Calculate the time range from the current time
+3. Use ISO 8601 format for all timestamps: YYYY-MM-DDTHH:MM:SS+00:00
+4. For CloudWatch queries:
+   - start_time: current_time - requested_period
+   - end_time: current_time
+
+Example workflow for "last 32 days":
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Step 1: Get current time
+   Tool: get_current_time(timezone="UTC")
+   Result: "2025-12-04T18:30:00+00:00"
+
+Step 2: Calculate time range (32 days = 32 * 24 * 60 * 60 = 2,764,800 seconds)
+   Start time: "2025-11-02T18:30:00+00:00" (32 days before current)
+   End time: "2025-12-04T18:30:00+00:00" (current time)
+
+Step 3: Query CloudWatch with EXACT calculated timestamps
+   Example: Query Lambda errors for production-lambda-hybrid-recording-audio
+   - Use calculated start_time and end_time from Steps 1 & 2
+   - Use namespace "AWS/Lambda"
+   - Use dimensions with FunctionName including the full prefix
+
+⚠️  CRITICAL REMINDERS:
+   - DO NOT use dates from 2024 or any past year!
+   - DO NOT guess or hardcode timestamps!
+   - ALWAYS start with get_current_time!
+   - Current year is 2025!
 
 Answer questions using real data from the tools."""
 
@@ -646,8 +939,6 @@ def generate_ticketing_daily_report(conversation_history=None) -> tuple:
 
 if __name__ == "__main__":
 
-    import re
-
     import ast
 
    
@@ -788,12 +1079,42 @@ if __name__ == "__main__":
         with st.spinner(f"🔧 Initializing AWS MCP clients with profile: {st.session_state.current_aws_profile}..."):
             initialize_mcp_clients(st.session_state.current_aws_profile)
             st.session_state.bedrock_model = get_bedrock_model()
-            st.session_state.system_prompt = get_system_prompt()
+            
+            # Determine dashboard path based on profile or use default
+            dashboard_path = 'dashboard/applink.json'  # Default for wfoprod
+            if st.session_state.current_aws_profile == 'production-rec':
+                # Could use different dashboard for production-rec if exists
+                # dashboard_path = 'dashboard/smartreach.json' or 'dashboard/ticketing.json'
+                pass
+            
+            st.session_state.system_prompt = get_system_prompt(dashboard_path)
+            
+            # Wrap tools with logging before passing to agent
+            all_tools = time_tools + cloudwatch_tools
+            print(f"\n🔧 Total tools being passed to agent: {len(all_tools)}")
+            for tool in all_tools:
+                tool_name = getattr(tool, 'tool_name', getattr(tool, 'name', 'Unknown'))
+                print(f"   - {tool_name}")
+            print()
+            
             st.session_state.agent = Agent(
-                tools=time_tools + cloudwatch_tools,
+                tools=all_tools,
                 model=st.session_state.bedrock_model,
                 system_prompt=st.session_state.system_prompt
             )
+            
+            # Wrap agent's run method to log before execution
+            original_call = st.session_state.agent.__call__
+            def logged_agent_call(prompt, *args, **kwargs):
+                print(f"\n{'='*80}")
+                print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 📨 NEW USER PROMPT")
+                print(f"{'='*80}")
+                print(f"Prompt: {prompt[:200]}{'...' if len(str(prompt)) > 200 else ''}")
+                print(f"{'='*80}\n")
+                return original_call(prompt, *args, **kwargs)
+            
+            st.session_state.agent.__call__ = logged_agent_call
+            
             st.session_state.mcp_initialized = True
             st.session_state.profile_changed = False
 

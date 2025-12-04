@@ -115,7 +115,7 @@ os.environ["AWS_PROFILE"] = "default"
 
 # Create a BedrockModel - using Claude 3.5 Sonnet with Account A credentials
 bedrock_model = BedrockModel(
-    model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0"),
+    model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-7-sonnet-20250219-v1:0"),
     region_name=AWS_REGION,
     temperature=0.1,
 )
