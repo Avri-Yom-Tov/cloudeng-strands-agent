@@ -10,8 +10,7 @@ import atexit
 from typing import Dict
 
 # Import AWS configuration
-import awsConfig
-from awsConfig import AWS_PROFILE_FOR_TOOLS, AWS_REGION
+from config.main import AWS_PROFILE_FOR_TOOLS, AWS_REGION
 
 # Define common production support tasks
 PREDEFINED_TASKS = {
@@ -181,26 +180,8 @@ def get_agent(messages=None):
     
     return Agent(**agent_params)
 
-# Register cleanup handler for MCP clients
-def cleanup():
-    global time_mcp_client, cloudwatch_mcp_client
-    try:
-        if time_mcp_client:
-            time_mcp_client.stop()
-            print("Time MCP client stopped")
-    except Exception as e:
-        print(f"Error stopping Time MCP client: {e}")
-    
-    try:
-        if cloudwatch_mcp_client:
-            cloudwatch_mcp_client.stop()
-            print("CloudWatch MCP client stopped")
-    except Exception as e:
-        print(f"Error stopping CloudWatch MCP client: {e}")
 
-atexit.register(cleanup)
 
-# Function to execute a predefined task
 def execute_predefined_task(task_key: str, conversation_history=None) -> tuple:
     """Execute a predefined production support task
     

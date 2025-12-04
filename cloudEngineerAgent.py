@@ -9,9 +9,9 @@ import sys
 import atexit
 from typing import Dict
 
+
 # Import AWS configuration - this sets up environment variables for wfoprod profile
-import awsConfig
-from awsConfig import AWS_PROFILE_FOR_TOOLS, AWS_REGION
+from config.main import AWS_PROFILE_FOR_TOOLS, AWS_REGION
 
 # Define common cloud engineering tasks
 PREDEFINED_TASKS = {
@@ -167,14 +167,15 @@ agent = Agent(
 # Register cleanup handler for MCP clients
 def cleanup():
     try:
-        aws_docs_mcp_client.stop()
-        print("AWS Documentation MCP client stopped")
+        if 'aws_docs_mcp_client' in globals() and aws_docs_mcp_client:
+            aws_docs_mcp_client.stop()  # pylint: disable=no-value-for-parameter
+            print("AWS Documentation MCP client stopped")
     except Exception as e:
         print(f"Error stopping AWS Documentation MCP client: {e}")
-    
     try:
-        aws_diagram_mcp_client.stop()
-        print("AWS Diagram MCP client stopped")
+        if 'aws_diagram_mcp_client' in globals() and aws_diagram_mcp_client:
+            aws_diagram_mcp_client.stop()  # pylint: disable=no-value-for-parameter
+            print("AWS Diagram MCP client stopped")
     except Exception as e:
         print(f"Error stopping AWS Diagram MCP client: {e}")
 
