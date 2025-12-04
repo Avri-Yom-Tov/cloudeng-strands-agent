@@ -310,3 +310,9 @@ If you continue to experience issues, please provide:
 
 set AWS_REGION=us-west-2&& python cloud_engineer_agent.py
 streamlit run app.py
+
+
+
+streamlit run prodSupportAgent.py
+
+How many invocations were there in the last 5 hour for Lambda production-lambda-hybrid-recording-user-sync and were there any failures

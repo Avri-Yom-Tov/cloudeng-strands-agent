@@ -211,9 +211,71 @@ def get_predefined_tasks() -> Dict[str, str]:
 
 
 if __name__ == "__main__":
-    # Example usage - check Lambda invocations and errors in the last hour
-    result = execute_custom_task(
-        "How many invocations were there in the last hour for Lambda production-lambda-hybrid-recording-user-sync and were there any failures"
-    )
-    print(result)
+    import streamlit as st
+    import re
+    import ast
+    
+    def clean_response(response):
+        if not response:
+            return ""
+        
+        if not isinstance(response, str):
+            try:
+                response = str(response)
+            except:
+                return "Error: Could not convert response to string"
+        
+        cleaned = re.sub(r'<thinking>.*?</thinking>', '', response, flags=re.DOTALL)
+        
+        if cleaned.find("'role': 'assistant'") >= 0 and cleaned.find("'content'") >= 0 and cleaned.find("'text'") >= 0:
+            try:
+                data = ast.literal_eval(cleaned)
+                if isinstance(data, dict) and 'content' in data and isinstance(data['content'], list):
+                    for item in data['content']:
+                        if isinstance(item, dict) and 'text' in item:
+                            return item['text']
+            except:
+                match = re.search(r"'text': '(.+?)(?:'}]|})", cleaned, re.DOTALL)
+                if match:
+                    text = match.group(1)
+                    text = text.replace('\\n', '\n')
+                    text = text.replace('\\t', '\t')
+                    text = text.replace("\\'", "'")
+                    text = text.replace('\\"', '"')
+                    return text
+        
+        return cleaned.strip()
+    
+    st.set_page_config(page_title="Production Support", page_icon="🔧", layout="wide")
+    
+    st.title("🔧 AWS Production Support")
+    
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    if not st.session_state.messages:
+        with st.chat_message("assistant"):
+            st.markdown("👋 Ask me about Lambda invocations, errors, CloudWatch metrics, etc.")
+    
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    
+    if prompt := st.chat_input("Ask about production metrics..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        with st.chat_message("assistant"):
+            with st.spinner("🔍 Analyzing CloudWatch metrics..."):
+                response = execute_custom_task(prompt)
+                cleaned_response = clean_response(response)
+                st.markdown(cleaned_response)
+        
+        st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
+        st.rerun()
+
+
+
 
