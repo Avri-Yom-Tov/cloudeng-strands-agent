@@ -167,14 +167,19 @@ When querying specific resources, ONLY query that resource - don't make assumpti
 IMPORTANT: Never include <thinking> tags or expose your internal thought process in responses.
 """
 
-def get_agent():
-    """Get or create the agent"""
+def get_agent(messages=None):
+    """Get or create the agent with conversation history"""
     global time_tools, cloudwatch_tools
-    return Agent(
-        tools=[use_aws] + time_tools + cloudwatch_tools,
-        model=get_bedrock_model(),
-        system_prompt=get_system_prompt()
-    )
+    agent_params = {
+        'tools': [use_aws] + time_tools + cloudwatch_tools,
+        'model': get_bedrock_model(),
+        'system_prompt': get_system_prompt()
+    }
+    
+    if messages:
+        agent_params['messages'] = messages
+    
+    return Agent(**agent_params)
 
 # Register cleanup handler for MCP clients
 def cleanup():
@@ -196,29 +201,46 @@ def cleanup():
 atexit.register(cleanup)
 
 # Function to execute a predefined task
-def execute_predefined_task(task_key: str) -> str:
-    """Execute a predefined production support task"""
+def execute_predefined_task(task_key: str, conversation_history=None) -> tuple:
+    """Execute a predefined production support task
+    
+    Args:
+        task_key: Key of the predefined task
+        conversation_history: Optional list of previous messages in Bedrock format
+        
+    Returns:
+        tuple: (response_text, updated_messages)
+    """
     if task_key not in PREDEFINED_TASKS:
-        return f"Error: Task '{task_key}' not found in predefined tasks."
+        error_msg = f"Error: Task '{task_key}' not found in predefined tasks."
+        return error_msg, conversation_history or []
     
     task_description = PREDEFINED_TASKS[task_key]
-    return execute_custom_task(task_description)
+    return execute_custom_task(task_description, conversation_history)
 
 # Function to execute a custom task
-def execute_custom_task(task_description: str) -> str:
-    """Execute a custom production support task based on description"""
+def execute_custom_task(task_description: str, conversation_history=None) -> tuple:
+    """Execute a custom production support task based on description
+    
+    Args:
+        task_description: The task to execute
+        conversation_history: Optional list of previous messages in Bedrock format
+        
+    Returns:
+        tuple: (response_text, updated_messages)
+    """
     try:
-        agent = get_agent()
+        agent = get_agent(messages=conversation_history)
         response = agent(task_description)
         
         # Handle AgentResult object by extracting the message
-        if hasattr(response, 'message'):
-            return response.message
+        response_text = response.message if hasattr(response, 'message') else str(response)
         
-        # Handle other types of responses
-        return str(response)
+        # Return both the response and the updated conversation history
+        return response_text, agent.messages
     except Exception as e:
-        return f"Error executing task: {str(e)}"
+        error_msg = f"Error executing task: {str(e)}"
+        return error_msg, conversation_history or []
 
 # Function to get predefined tasks
 def get_predefined_tasks() -> Dict[str, str]:
@@ -272,30 +294,46 @@ if __name__ == "__main__":
             initialize_mcp_clients()
             st.session_state.mcp_initialized = True
     
+    # Initialize session state for UI messages (for display)
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
+    # Initialize session state for agent conversation history (Bedrock format)
+    if "agent_messages" not in st.session_state:
+        st.session_state.agent_messages = []
+    
+    # Display welcome message if no messages yet
     if not st.session_state.messages:
         with st.chat_message("assistant"):
             st.markdown("👋 Ask me about Lambda invocations, errors, CloudWatch metrics, etc.")
     
+    # Display all previous messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     
+    # Handle new user input
     if prompt := st.chat_input("Ask about production metrics..."):
+        # Add user message to UI history
         st.session_state.messages.append({"role": "user", "content": prompt})
         
         with st.chat_message("user"):
             st.markdown(prompt)
         
+        # Get response from agent with conversation history
         with st.chat_message("assistant"):
             with st.spinner("🔍 Analyzing CloudWatch metrics..."):
-                response = execute_custom_task(prompt)
+                response, updated_agent_messages = execute_custom_task(
+                    prompt, 
+                    conversation_history=st.session_state.agent_messages
+                )
                 cleaned_response = clean_response(response)
                 st.markdown(cleaned_response)
         
+        # Update both histories
         st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
+        st.session_state.agent_messages = updated_agent_messages
+        
         st.rerun()
 
 
