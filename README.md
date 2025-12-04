@@ -233,3 +233,14 @@ For more information about Strands Agents SDK, visit the [official documentation
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+
+
+
+
+
+
+
+set AWS_REGION=us-west-2&& python cloud_engineer_agent.py
+set AWS_REGION=us-west-2&& streamlit run app.py

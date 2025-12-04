@@ -71,7 +71,11 @@ try:
     aws_diagram_mcp_client.start()
     print("AWS Diagram MCP client started successfully.")
     
+    # Set flag to indicate MCP clients are initialized
+    mcp_initialized = True
+    
 except Exception as e:
+    mcp_initialized = False
     error_message = str(e)
     print(f"Error initializing MCP clients: {error_message}")
     
@@ -95,10 +99,10 @@ except Exception as e:
 docs_tools = aws_docs_mcp_client.list_tools_sync()
 diagram_tools = aws_diagram_mcp_client.list_tools_sync()
 
-# Create a BedrockModel with system inference profile
+# Create a BedrockModel - using Claude 3.5 Sonnet instead of Nova Premier
 bedrock_model = BedrockModel(
-    model_id="us.amazon.nova-premier-v1:0",  # System inference profile ID
-    region_name=os.environ.get("AWS_REGION", "us-east-1"),
+    model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0"),
+    region_name=os.environ.get("AWS_REGION", "us-west-2"),
     temperature=0.1,
 )
 
