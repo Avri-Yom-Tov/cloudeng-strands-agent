@@ -9,6 +9,10 @@ import sys
 import atexit
 from typing import Dict
 
+# Import AWS configuration - this sets up environment variables for wfoprod profile
+import aws_tools_wrapper
+from aws_tools_wrapper import AWS_PROFILE_FOR_TOOLS, AWS_REGION
+
 # Define common cloud engineering tasks
 PREDEFINED_TASKS = {
     "ec2_status": "List all EC2 instances and their status",
@@ -99,15 +103,29 @@ except Exception as e:
 docs_tools = aws_docs_mcp_client.list_tools_sync()
 diagram_tools = aws_diagram_mcp_client.list_tools_sync()
 
-# Create a BedrockModel - using Claude 3.5 Sonnet instead of Nova Premier
+# Configure AWS profiles for cross-account access
+# The aws_tools_wrapper has already set AWS_PROFILE to wfoprod for use_aws tool
+# But we need to temporarily switch to 'default' profile for Bedrock initialization
+
+# Save the wfoprod profile setting
+wfoprod_profile = os.environ.get("AWS_PROFILE")
+
+# Temporarily use default profile for Bedrock (Account A with Bedrock permissions)
+os.environ["AWS_PROFILE"] = "default"
+
+# Create a BedrockModel - using Claude 3.5 Sonnet with Account A credentials
 bedrock_model = BedrockModel(
     model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0"),
-    region_name=os.environ.get("AWS_REGION", "us-west-2"),
+    region_name=AWS_REGION,
     temperature=0.1,
 )
 
+# Restore wfoprod profile for use_aws tool
+if wfoprod_profile:
+    os.environ["AWS_PROFILE"] = wfoprod_profile
+
 # System prompt for the agent
-system_prompt = """
+system_prompt = f"""
 You are an expert AWS Cloud Engineer assistant. Your job is to help with AWS infrastructure 
 management, optimization, security, and best practices. You can:
 
@@ -126,10 +144,20 @@ descriptions into complete architecture diagrams.
 Always provide clear, actionable advice with specific AWS CLI commands or console steps when applicable.
 Focus on security best practices and cost optimization in your recommendations.
 
+CRITICAL AWS CONFIGURATION:
+- You are querying AWS Account: {AWS_PROFILE_FOR_TOOLS} (Account ID: 918987959928 - wfoprod)
+- Region: {AWS_REGION}
+- The use_aws tool is automatically configured to use profile {AWS_PROFILE_FOR_TOOLS}
+- You do NOT need to specify --profile in your commands (it's handled automatically)
+
+When user asks about a specific resource (like "production-lambda-hybrid-recording-user-sync"), 
+query ONLY that specific resource - do not query other resources or make assumptions.
+
 IMPORTANT: Never include <thinking> tags or expose your internal thought process in responses.
 """
 
-# Create the agent with all tools and Bedrock Nova Premier model
+# Create the agent with all tools and Bedrock model
+# use_aws will automatically use wfoprod profile (set by aws_tools_wrapper)
 agent = Agent(
     tools=[use_aws] + docs_tools + diagram_tools,
     model=bedrock_model,
