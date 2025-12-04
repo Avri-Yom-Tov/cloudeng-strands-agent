@@ -61,9 +61,9 @@ cloudwatch_tools = []
 
 
 
-def initialize_mcp_clients():
+def initialize_mcp_clients(aws_profile='wfoprod'):
 
-    """Initialize MCP clients once"""
+    """Initialize MCP clients once with specified AWS profile"""
 
     global time_mcp_client, cloudwatch_mcp_client, time_tools, cloudwatch_tools
 
@@ -72,6 +72,8 @@ def initialize_mcp_clients():
     is_windows = sys.platform.startswith('win')
 
     print(f"Detected platform: {'Windows' if is_windows else 'Non-Windows (Linux/macOS)'}")
+
+    print(f"Initializing MCP clients with AWS profile: {aws_profile}")
 
 
 
@@ -113,8 +115,8 @@ def initialize_mcp_clients():
 
                     env={
                         "FASTMCP_LOG_LEVEL": "ERROR",
-                        "AWS_PROFILE": 'wfoprod',
-                        "AWS_REGION": 'us-west-2'
+                        "AWS_PROFILE": aws_profile,
+                        "AWS_REGION": AWS_REGION
                     }
 
                 )
@@ -157,7 +159,7 @@ def initialize_mcp_clients():
 
                     env={
                         "FASTMCP_LOG_LEVEL": "ERROR",
-                        "AWS_PROFILE": AWS_PROFILE_FOR_TOOLS,
+                        "AWS_PROFILE": aws_profile,
                         "AWS_REGION": AWS_REGION
                     }
 
@@ -554,6 +556,52 @@ def generate_applink_daily_report(conversation_history=None) -> tuple:
     except Exception as e:
         return f"Error generating report: {str(e)}", conversation_history or []
 
+def generate_smartreach_daily_report(conversation_history=None) -> tuple:
+    """Generate the SmartReach Daily Report using the prompt and dashboard file"""
+    try:
+        # Read prompt file
+        try:
+            with open('prompts/smartReachReport.md', 'r', encoding='utf-8') as f:
+                prompt_content = f.read()
+        except FileNotFoundError:
+            return "Error: prompts/smartReachReport.md not found.", conversation_history or []
+
+        # Read dashboard file
+        try:
+            with open('dashboard/smartReach.json', 'r', encoding='utf-8') as f:
+                dashboard_content = f.read()
+        except FileNotFoundError:
+            return "Error: dashboard/smartReach.json not found.", conversation_history or []
+
+        full_prompt = f"{prompt_content}\n\nHere is the dashboard configuration (smartReach-prod-dashboard.json):\n```json\n{dashboard_content}\n```"
+        
+        return execute_custom_task(full_prompt, conversation_history)
+    except Exception as e:
+        return f"Error generating report: {str(e)}", conversation_history or []
+
+def generate_ticketing_daily_report(conversation_history=None) -> tuple:
+    """Generate the Ticketing Daily Report using the prompt and dashboard file"""
+    try:
+        # Read prompt file
+        try:
+            with open('prompts/ticketingDailyReport.md', 'r', encoding='utf-8') as f:
+                prompt_content = f.read()
+        except FileNotFoundError:
+            return "Error: prompts/ticketingDailyReport.md not found.", conversation_history or []
+
+        # Read dashboard file
+        try:
+            with open('dashboard/ticketing.json', 'r', encoding='utf-8') as f:
+                dashboard_content = f.read()
+        except FileNotFoundError:
+            return "Error: dashboard/ticketing.json not found.", conversation_history or []
+
+        full_prompt = f"{prompt_content}\n\nHere is the dashboard configuration (ticketing-prod-dashboard.json):\n```json\n{dashboard_content}\n```"
+        
+        return execute_custom_task(full_prompt, conversation_history)
+    except Exception as e:
+        return f"Error generating report: {str(e)}", conversation_history or []
+
 
 if __name__ == "__main__":
 
@@ -688,10 +736,14 @@ if __name__ == "__main__":
         </style>
     """, unsafe_allow_html=True)
 
-    # Initialize MCP clients only once in session state
-    if "mcp_initialized" not in st.session_state:
-        with st.spinner("🔧 Initializing AWS MCP clients..."):
-            initialize_mcp_clients()
+    # Initialize current AWS profile in session state
+    if "current_aws_profile" not in st.session_state:
+        st.session_state.current_aws_profile = "wfoprod"
+
+    # Initialize MCP clients only once in session state or when profile changes
+    if "mcp_initialized" not in st.session_state or st.session_state.get("profile_changed", False):
+        with st.spinner(f"🔧 Initializing AWS MCP clients with profile: {st.session_state.current_aws_profile}..."):
+            initialize_mcp_clients(st.session_state.current_aws_profile)
             st.session_state.bedrock_model = get_bedrock_model()
             st.session_state.system_prompt = get_system_prompt()
             st.session_state.agent = Agent(
@@ -700,6 +752,7 @@ if __name__ == "__main__":
                 system_prompt=st.session_state.system_prompt
             )
             st.session_state.mcp_initialized = True
+            st.session_state.profile_changed = False
 
     # Initialize session state for UI messages (for display)
     if "messages" not in st.session_state:
@@ -711,15 +764,62 @@ if __name__ == "__main__":
 
     # Sidebar with modern design
     with st.sidebar:
-        st.markdown("### 📊 Reports & Actions")
+        st.markdown("### 🔧 AWS Profile")
         st.markdown("---")
         
-        # Daily Report Section
-        st.markdown("#### 📅 Daily Report")
-        if st.button("🚀 Generate AppLink Report", type="primary", use_container_width=True):
-            st.session_state.generating_report = True
-            st.session_state.messages.append({"role": "user", "content": "Generate AppLink Daily Report"})
-            st.rerun()
+        # Profile selector
+        current_profile = st.session_state.current_aws_profile
+        
+        profile_options = ["wfoprod", "production-rec"]
+        profile_display = {"wfoprod": "🟢 WFO Prod", "production-rec": "🔵 Production REC"}
+        
+        selected_profile = st.selectbox(
+            "Select AWS Profile",
+            options=profile_options,
+            index=profile_options.index(current_profile),
+            format_func=lambda x: profile_display[x]
+        )
+        
+        if selected_profile != current_profile:
+            if st.button("🔄 Switch Profile & Reload", type="primary", use_container_width=True):
+                st.session_state.current_aws_profile = selected_profile
+                st.session_state.profile_changed = True
+                st.session_state.mcp_initialized = False
+                st.session_state.messages = []
+                st.session_state.agent_messages = []
+                st.rerun()
+        
+        st.markdown("---")
+        st.markdown("### 📊 Daily Reports")
+        st.markdown("---")
+        
+        # Report configuration
+        report_configs = {
+            "applink": {
+                "label": "🚀 AppLink Report",
+                "required_profile": "wfoprod",
+                "report_type": "applink"
+            },
+            "smartreach": {
+                "label": "🌐 SmartReach Report",
+                "required_profile": "production-rec",
+                "report_type": "smartreach"
+            },
+            "ticketing": {
+                "label": "🎫 Ticketing Report",
+                "required_profile": "production-rec",
+                "report_type": "ticketing"
+            }
+        }
+        
+        for report_key, config in report_configs.items():
+            if st.button(config["label"], use_container_width=True):
+                if st.session_state.current_aws_profile != config["required_profile"]:
+                    st.warning(f"⚠️ You must switch profile to '{config['required_profile']}' to select this option!")
+                else:
+                    st.session_state.generating_report = config["report_type"]
+                    st.session_state.messages.append({"role": "user", "content": f"Generate {config['label']} Daily Report"})
+                    st.rerun()
         
         st.markdown("---")
         
@@ -755,7 +855,7 @@ if __name__ == "__main__":
         st.markdown("#### 💡 System Status")
         st.success("✓ MCP Clients Ready")
         st.info(f"Region: {AWS_REGION}")
-        st.info(f"Profile: {AWS_PROFILE_FOR_TOOLS}")
+        st.info(f"Profile: {st.session_state.current_aws_profile}")
         
         st.markdown("---")
         
@@ -770,10 +870,26 @@ if __name__ == "__main__":
 
     # Handle report generation with progress
     if st.session_state.get("generating_report", False):
+        report_type = st.session_state.generating_report
         st.session_state.generating_report = False
         
+        report_names = {
+            "applink": "AppLink Daily Report",
+            "smartreach": "SmartReach Daily Report",
+            "ticketing": "Ticketing Daily Report"
+        }
+        
+        report_functions = {
+            "applink": generate_applink_daily_report,
+            "smartreach": generate_smartreach_daily_report,
+            "ticketing": generate_ticketing_daily_report
+        }
+        
+        report_name = report_names.get(report_type, "Unknown Report")
+        report_function = report_functions.get(report_type)
+        
         with st.chat_message("user"):
-            st.markdown("Generate AppLink Daily Report")
+            st.markdown(f"Generate {report_name}")
         
         with st.chat_message("assistant"):
             progress_placeholder = st.empty()
@@ -782,9 +898,13 @@ if __name__ == "__main__":
             progress_placeholder.progress(0.2)
             status_placeholder.info("📊 Collecting CloudWatch metrics...")
             
-            response, updated_agent_messages = generate_applink_daily_report(
-                conversation_history=st.session_state.agent_messages
-            )
+            if report_function:
+                response, updated_agent_messages = report_function(
+                    conversation_history=st.session_state.agent_messages
+                )
+            else:
+                response = f"Error: Unknown report type '{report_type}'"
+                updated_agent_messages = st.session_state.agent_messages
             
             progress_placeholder.progress(0.8)
             status_placeholder.info("📝 Generating comprehensive report...")
@@ -802,17 +922,25 @@ if __name__ == "__main__":
     # Display welcome message if no messages yet
     if not st.session_state.messages:
         with st.chat_message("assistant"):
-            st.markdown("""
+            profile_emoji = "🟢" if st.session_state.current_aws_profile == "wfoprod" else "🔵"
+            st.markdown(f"""
             👋 **Welcome to AWS Production Support!**
             
+            **Current Profile:** {profile_emoji} `{st.session_state.current_aws_profile}`
+            
             I can help you with:
-            - 📊 Generate comprehensive daily reports
+            - 📊 Generate comprehensive daily reports (AppLink, SmartReach, Ticketing)
             - 🔍 Analyze Lambda invocations and errors
             - ⚠️ Check CloudWatch alarms
             - 📈 Review performance metrics
             - 🔎 Investigate error patterns
             
-            Use the sidebar for quick actions or ask me anything about your production environment.
+            **Available Reports:**
+            - 🚀 **AppLink Report** (requires `wfoprod` profile)
+            - 🌐 **SmartReach Report** (requires `production-rec` profile)
+            - 🎫 **Ticketing Report** (requires `production-rec` profile)
+            
+            Use the sidebar to switch profiles and generate reports, or ask me anything about your production environment.
             """)
 
     # Display all previous messages
