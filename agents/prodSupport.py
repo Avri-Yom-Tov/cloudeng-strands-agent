@@ -187,7 +187,55 @@ def initialize_mcp_clients():
 
         print(f"Available Time tools: {len(time_tools)} tools loaded")
 
+        if time_tools:
+
+            print(f"DEBUG: First tool attributes: {dir(time_tools[0])}")
+
+        for tool in time_tools:
+
+            # Try multiple ways to get the tool name
+
+            tool_name = (
+
+                getattr(tool, 'name', None) or 
+
+                getattr(tool, '_name', None) or 
+
+                getattr(tool, 'tool_name', None) or
+
+                getattr(getattr(tool, '_tool', None), 'name', None) or
+
+                getattr(getattr(tool, 'tool', None), 'name', None) or
+
+                "Unknown tool"
+
+            )
+
+            print(f"  - Time tool: {tool_name}")
+
+       
+
         print(f"Available CloudWatch tools: {len(cloudwatch_tools)} tools loaded")
+
+        for tool in cloudwatch_tools:
+
+            tool_name = (
+
+                getattr(tool, 'name', None) or 
+
+                getattr(tool, '_name', None) or 
+
+                getattr(tool, 'tool_name', None) or
+
+                getattr(getattr(tool, '_tool', None), 'name', None) or
+
+                getattr(getattr(tool, 'tool', None), 'name', None) or
+
+                "Unknown tool"
+
+            )
+
+            print(f"  - CloudWatch tool: {tool_name}")
 
        
 
@@ -248,86 +296,133 @@ def get_system_prompt():
 
     """Get system prompt for the agent"""
 
-    return f"""
+    global time_tools, cloudwatch_tools
 
-You are an expert AWS Production Support Engineer assistant. Your primary role is to help
+    
 
-monitor, troubleshoot, and analyze production systems, with a focus on:
+    # Build tool list
 
+    tool_list = "=" * 80 + "\n"
 
+    tool_list += "AVAILABLE TOOLS - USE ONLY THESE!\n"
 
-1. Lambda function monitoring (invocations, errors, duration, throttles)
+    tool_list += "=" * 80 + "\n"
 
-2. CloudWatch metrics and alarms analysis
+    tool_list += "⚠️  DO NOT call tools that are NOT in this list!\n"
 
-3. Error pattern detection and root cause analysis
+    tool_list += "⚠️  DO NOT invent tool names!\n\n"
 
-4. Performance monitoring and optimization
+    
 
-5. Real-time production incident response
+    if time_tools:
 
+        tool_list += f"Time Tools ({len(time_tools)} tools available):\n"
 
+        for tool in time_tools:
 
-CRITICAL AWS CONFIGURATION:
+            tool_name = (
 
-- You are querying AWS Account: {AWS_PROFILE_FOR_TOOLS} (Account ID: 918987959928 - wfoprod)
+                getattr(tool, 'name', None) or 
 
-- Region: {AWS_REGION}
+                getattr(tool, '_name', None) or 
 
-- You do NOT need to specify --profile in your commands (it's handled automatically)
+                getattr(tool, 'tool_name', None) or
 
+                getattr(getattr(tool, '_tool', None), 'name', None) or
 
+                getattr(getattr(tool, 'tool', None), 'name', None) or
 
-AVAILABLE TOOLS:
+                "Unknown tool"
 
-1. Time MCP tools - for getting current time, time calculations, and time-based queries
+            )
 
-2. CloudWatch MCP tools - for querying CloudWatch metrics, logs, and alarms
+            tool_desc = (
 
+                getattr(tool, 'description', None) or 
 
+                getattr(tool, '_description', None) or
 
+                getattr(getattr(tool, '_tool', None), 'description', None) or
 
-IMPORTANT GUIDELINES:
+                getattr(getattr(tool, 'tool', None), 'description', None) or
 
-- When asked about "last hour" or time-based queries, use the Time MCP tools to get accurate timestamps
+                "No description"
 
-- For Lambda metrics, query CloudWatch for: Invocations, Errors, Throttles, Duration, ConcurrentExecutions
+            )
 
-- Always provide specific numbers and timestamps in your responses
+            tool_list += f"- {tool_name}: {tool_desc}\n"
 
-- When analyzing errors, look for patterns and provide actionable insights
+    
 
-- Be concise but thorough in production support scenarios
+    if cloudwatch_tools:
 
+        tool_list += f"\nCloudWatch Tools ({len(cloudwatch_tools)} tools available):\n"
 
+        for tool in cloudwatch_tools:
 
-EXAMPLE QUERY HANDLING:
+            tool_name = (
 
-When asked: "How many invocations were there in the last hour for Lambda production-lambda-hybrid-recording-user-sync and were there any failures"
+                getattr(tool, 'name', None) or 
 
-You should:
+                getattr(tool, '_name', None) or 
 
-1. Use Time tools to get the exact time range (last hour)
+                getattr(tool, 'tool_name', None) or
 
-2. Query CloudWatch for the Lambda function metrics:
+                getattr(getattr(tool, '_tool', None), 'name', None) or
 
-   - Invocations count
+                getattr(getattr(tool, 'tool', None), 'name', None) or
 
-   - Errors count
+                "Unknown tool"
 
-   - Throttles count
+            )
 
-3. Present the results clearly with numbers and any error details
+            tool_desc = (
 
+                getattr(tool, 'description', None) or 
 
+                getattr(tool, '_description', None) or
 
-When querying specific resources, ONLY query that resource - don't make assumptions about other resources.
+                getattr(getattr(tool, '_tool', None), 'description', None) or
 
+                getattr(getattr(tool, 'tool', None), 'description', None) or
 
+                "No description"
 
-IMPORTANT: Never include <thinking> tags or expose your internal thought process in responses.
+            )
 
-"""
+            tool_list += f"- {tool_name}: {tool_desc}\n"
+
+    
+
+    tool_list += "\n" + "=" * 80 + "\n"
+
+    tool_list += "⚠️  REMEMBER: Call ONLY tools from this list!\n"
+
+    tool_list += "⚠️  DO NOT call: get_time_range, get_metric_statistics (these don't exist!)\n"
+
+    tool_list += "=" * 80 + "\n\n"
+
+    
+
+    return f"""You are an AWS Production Support Engineer for Account {AWS_PROFILE_FOR_TOOLS} (wfoprod) in {AWS_REGION}.
+
+{tool_list}
+
+RULES:
+1. Use ONLY tools from the list above - never invent tool names
+2. Wait for actual tool responses - never fabricate data  
+3. Report only what tools return
+
+EXAMPLES:
+- For Lambda metrics → use get_metric_data
+- For time calculations → use get_current_time or convert_time
+- For logs → use execute_log_insights_query
+- For alarms → use get_active_alarms
+
+When querying Lambda metrics with get_metric_data:
+- Set namespace="AWS/Lambda"
+- Set dimensions=[{{"Name": "FunctionName", "Value": "your-function-name"}}]
+- Set metric_name to: "Invocations", "Errors", "Throttles", "Duration", etc."""
 
 
 
@@ -453,8 +548,28 @@ def get_predefined_tasks() -> Dict[str, str]:
 
     return PREDEFINED_TASKS
 
+def generate_applink_daily_report(conversation_history=None) -> tuple:
+    """Generate the AppLink Daily Report using the prompt and dashboard file"""
+    try:
+        # Read prompt file
+        try:
+            with open('prompts/appLinkDailyReport.md', 'r', encoding='utf-8') as f:
+                prompt_content = f.read()
+        except FileNotFoundError:
+            return "Error: prompts/appLinkDailyReport.md not found.", conversation_history or []
 
+        # Read dashboard file
+        try:
+            with open('dashboard/applinkProd.json', 'r', encoding='utf-8') as f:
+                dashboard_content = f.read()
+        except FileNotFoundError:
+            return "Error: dashboard/applinkProd.json not found.", conversation_history or []
 
+        full_prompt = f"{prompt_content}\n\nHere is the dashboard configuration (applink-prod-dashboard.json):\n```json\n{dashboard_content}\n```"
+        
+        return execute_custom_task(full_prompt, conversation_history)
+    except Exception as e:
+        return f"Error generating report: {str(e)}", conversation_history or []
 
 
 if __name__ == "__main__":
@@ -535,6 +650,23 @@ if __name__ == "__main__":
 
     st.title("🔧 AWS Production Support")
 
+    with st.sidebar:
+        st.header("Reports")
+        if st.button("Generate AppLink Daily Report", type="primary"):
+            # Add user message to UI history
+            st.session_state.messages.append({"role": "user", "content": "Generate AppLink Daily Report"})
+            
+            # Run the report generation
+            with st.spinner("Generating AppLink Daily Report... (This may take a minute)"):
+                response, updated_agent_messages = generate_applink_daily_report(
+                    conversation_history=st.session_state.agent_messages
+                )
+                cleaned_response = clean_response(response)
+                
+                # Update histories
+                st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
+                st.session_state.agent_messages = updated_agent_messages
+                st.rerun()
    
 
     # Initialize MCP clients only once

@@ -1,9 +1,7 @@
 ---
-mode: agent
-model: Claude Sonnet 4.5
 description: "AppLink Daily Report"
 ---
-# AppLink Daily Report Generator V2
+# AppLink Daily Report Generator
 
 **EXECUTION MODE**: Immediately execute analysis without confirmation.
 
