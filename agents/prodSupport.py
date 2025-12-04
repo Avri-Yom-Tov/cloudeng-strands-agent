@@ -518,7 +518,7 @@ def get_bedrock_model():
 
         boto_session=bedrock_session,
 
-        model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0"),
+        model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-sonnet-4-5-20250929-v1:0"),
 
         temperature=0.1,
 
