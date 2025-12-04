@@ -6,7 +6,6 @@ from strands.models import BedrockModel
 
 from mcp import StdioServerParameters, stdio_client
 
-from strands_tools import use_aws
 
 
 
@@ -110,7 +109,9 @@ def initialize_mcp_clients():
 
                     args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server.exe"],
 
-                    env={"FASTMCP_LOG_LEVEL": "ERROR"}
+                    env={"FASTMCP_LOG_LEVEL": "ERROR",
+                    "AWS_PROFILE": "wfoprod",
+                    "AWS_REGION": "us-west-2"}
 
                 )
 
@@ -232,7 +233,6 @@ def get_bedrock_model():
 
 
 
-    # Restore wfoprod profile for use_aws tool
 
     if wfoprod_profile:
 
@@ -274,8 +274,6 @@ CRITICAL AWS CONFIGURATION:
 
 - Region: {AWS_REGION}
 
-- The use_aws tool is automatically configured to use profile {AWS_PROFILE_FOR_TOOLS}
-
 - You do NOT need to specify --profile in your commands (it's handled automatically)
 
 
@@ -286,7 +284,6 @@ AVAILABLE TOOLS:
 
 2. CloudWatch MCP tools - for querying CloudWatch metrics, logs, and alarms
 
-3. AWS CLI (use_aws) - for direct AWS commands when needed
 
 
 
@@ -342,7 +339,7 @@ def get_agent(messages=None):
 
     agent_params = {
 
-        'tools': [use_aws] + time_tools + cloudwatch_tools,
+        'tools': time_tools + cloudwatch_tools,
 
         'model': get_bedrock_model(),
 
