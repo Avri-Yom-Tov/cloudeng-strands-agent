@@ -13,9 +13,11 @@ import os
 
 import sys
 
-import atexit
-
 from typing import Dict
+
+import streamlit as st
+
+import boto3
 
 
 
@@ -89,9 +91,9 @@ def initialize_mcp_clients():
 
                 StdioServerParameters(
 
-                    command="uvx",
+                    command="uv",
 
-                    args=["mcp-server-time"]
+                    args=["tool", "run", "mcp-server-time"]
 
                 )
 
@@ -105,13 +107,15 @@ def initialize_mcp_clients():
 
                 StdioServerParameters(
 
-                    command="uvx",
+                    command="uv",
 
-                    args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server.exe"],
+                    args=["tool", "run", "--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server.exe"],
 
-                    env={"FASTMCP_LOG_LEVEL": "ERROR",
-                    "AWS_PROFILE": "wfoprod",
-                    "AWS_REGION": "us-west-2"}
+                    env={
+                        "FASTMCP_LOG_LEVEL": "ERROR",
+                        "AWS_PROFILE": AWS_PROFILE_FOR_TOOLS,
+                        "AWS_REGION": AWS_REGION
+                    }
 
                 )
 
@@ -151,7 +155,11 @@ def initialize_mcp_clients():
 
                     args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server"],
 
-                    env={"FASTMCP_LOG_LEVEL": "ERROR"}
+                    env={
+                        "FASTMCP_LOG_LEVEL": "ERROR",
+                        "AWS_PROFILE": AWS_PROFILE_FOR_TOOLS,
+                        "AWS_REGION": AWS_REGION
+                    }
 
                 )
 
@@ -253,40 +261,45 @@ def initialize_mcp_clients():
 
 def get_bedrock_model():
 
-    """Get or create Bedrock model"""
+    """Get or create Bedrock model with proper boto3 session"""
 
-    # Configure AWS profiles for cross-account access
+    # Create a dedicated boto3 session for Bedrock using 'default' profile
 
-    wfoprod_profile = os.environ.get("AWS_PROFILE")
+    # This is cleaner than modifying environment variables
 
+    bedrock_profile = os.environ.get("BEDROCK_AWS_PROFILE", "default")
 
+    bedrock_region = os.environ.get("BEDROCK_REGION", AWS_REGION)
 
-    # Temporarily use default profile for Bedrock
+    
 
-    os.environ["AWS_PROFILE"] = "default"
+    # Create boto3 session with proper region
 
+    bedrock_session = boto3.Session(
 
+        profile_name=bedrock_profile,
 
-    # Create a BedrockModel - using Claude 3.5 Sonnet
+        region_name=bedrock_region
+
+    )
+
+    
+
+    # Create a BedrockModel with proper session - using Claude 3.5 Sonnet v2 (better tool calling)
+
+    # Note: Cannot specify both boto_session and region_name, so region comes from the session
 
     bedrock_model = BedrockModel(
 
-        model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0"),
+        boto_session=bedrock_session,
 
-        region_name=AWS_REGION,
+        model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0"),
 
         temperature=0.1,
 
     )
 
-
-
-
-    if wfoprod_profile:
-
-        os.environ["AWS_PROFILE"] = wfoprod_profile
-
-   
+    
 
     return bedrock_model
 
@@ -406,51 +419,11 @@ def get_system_prompt():
 
     return f"""You are an AWS Production Support Engineer for Account {AWS_PROFILE_FOR_TOOLS} (wfoprod) in {AWS_REGION}.
 
+You have tools available to query CloudWatch metrics and logs. Use them to get actual data.
+
 {tool_list}
 
-RULES:
-1. Use ONLY tools from the list above - never invent tool names
-2. Wait for actual tool responses - never fabricate data  
-3. Report only what tools return
-
-EXAMPLES:
-- For Lambda metrics → use get_metric_data
-- For time calculations → use get_current_time or convert_time
-- For logs → use execute_log_insights_query
-- For alarms → use get_active_alarms
-
-When querying Lambda metrics with get_metric_data:
-- Set namespace="AWS/Lambda"
-- Set dimensions=[{{"Name": "FunctionName", "Value": "your-function-name"}}]
-- Set metric_name to: "Invocations", "Errors", "Throttles", "Duration", etc."""
-
-
-
-def get_agent(messages=None):
-
-    """Get or create the agent with conversation history"""
-
-    global time_tools, cloudwatch_tools
-
-    agent_params = {
-
-        'tools': time_tools + cloudwatch_tools,
-
-        'model': get_bedrock_model(),
-
-        'system_prompt': get_system_prompt()
-
-    }
-
-   
-
-    if messages:
-
-        agent_params['messages'] = messages
-
-   
-
-    return Agent(**agent_params)
+Answer questions using real data from the tools."""
 
 
 
@@ -516,9 +489,19 @@ def execute_custom_task(task_description: str, conversation_history=None) -> tup
 
     try:
 
-        agent = get_agent(messages=conversation_history)
+        # Use session state agent (Streamlit context)
 
-        response = agent(task_description)
+        agent_instance = st.session_state.get('agent')
+
+        
+
+        if agent_instance is None:
+
+            return "Error: Agent not initialized. Please refresh the page.", conversation_history or []
+
+        
+
+        response = agent_instance(task_description)
 
        
 
@@ -530,7 +513,7 @@ def execute_custom_task(task_description: str, conversation_history=None) -> tup
 
         # Return both the response and the updated conversation history
 
-        return response_text, agent.messages
+        return response_text, agent_instance.messages
 
     except Exception as e:
 
@@ -573,8 +556,6 @@ def generate_applink_daily_report(conversation_history=None) -> tuple:
 
 
 if __name__ == "__main__":
-
-    import streamlit as st
 
     import re
 
@@ -669,13 +650,27 @@ if __name__ == "__main__":
                 st.rerun()
    
 
-    # Initialize MCP clients only once
+    # Initialize MCP clients only once in session state
 
     if "mcp_initialized" not in st.session_state:
 
-        with st.spinner("Initializing MCP clients..."):
+        with st.spinner("🔧 Initializing AWS MCP clients..."):
 
             initialize_mcp_clients()
+
+            st.session_state.bedrock_model = get_bedrock_model()
+
+            st.session_state.system_prompt = get_system_prompt()
+
+            st.session_state.agent = Agent(
+
+                tools=time_tools + cloudwatch_tools,
+
+                model=st.session_state.bedrock_model,
+
+                system_prompt=st.session_state.system_prompt
+
+            )
 
             st.session_state.mcp_initialized = True
 
