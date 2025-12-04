@@ -93,8 +93,8 @@ except Exception as e:
 time_tools = time_mcp_client.list_tools_sync()
 cloudwatch_tools = cloudwatch_mcp_client.list_tools_sync()
 
-print(f"Available Time tools: {[tool.name for tool in time_tools]}")
-print(f"Available CloudWatch tools: {[tool.name for tool in cloudwatch_tools]}")
+print(f"Available Time tools: {len(time_tools)} tools loaded")
+print(f"Available CloudWatch tools: {len(cloudwatch_tools)} tools loaded")
 
 # Configure AWS profiles for cross-account access
 wfoprod_profile = os.environ.get("AWS_PROFILE")
