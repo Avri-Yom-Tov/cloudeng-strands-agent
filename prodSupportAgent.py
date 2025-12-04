@@ -10,8 +10,8 @@ import atexit
 from typing import Dict
 
 # Import AWS configuration
-import aws_tools_wrapper
-from aws_tools_wrapper import AWS_PROFILE_FOR_TOOLS, AWS_REGION
+import awsConfig
+from awsConfig import AWS_PROFILE_FOR_TOOLS, AWS_REGION
 
 # Define common production support tasks
 PREDEFINED_TASKS = {

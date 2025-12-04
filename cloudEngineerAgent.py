@@ -10,8 +10,8 @@ import atexit
 from typing import Dict
 
 # Import AWS configuration - this sets up environment variables for wfoprod profile
-import aws_tools_wrapper
-from aws_tools_wrapper import AWS_PROFILE_FOR_TOOLS, AWS_REGION
+import awsConfig
+from awsConfig import AWS_PROFILE_FOR_TOOLS, AWS_REGION
 
 # Define common cloud engineering tasks
 PREDEFINED_TASKS = {
@@ -104,7 +104,7 @@ docs_tools = aws_docs_mcp_client.list_tools_sync()
 diagram_tools = aws_diagram_mcp_client.list_tools_sync()
 
 # Configure AWS profiles for cross-account access
-# The aws_tools_wrapper has already set AWS_PROFILE to wfoprod for use_aws tool
+# The awsConfig has already set AWS_PROFILE to wfoprod for use_aws tool
 # But we need to temporarily switch to 'default' profile for Bedrock initialization
 
 # Save the wfoprod profile setting
@@ -157,7 +157,7 @@ IMPORTANT: Never include <thinking> tags or expose your internal thought process
 """
 
 # Create the agent with all tools and Bedrock model
-# use_aws will automatically use wfoprod profile (set by aws_tools_wrapper)
+# use_aws will automatically use wfoprod profile (set by awsConfig)
 agent = Agent(
     tools=[use_aws] + docs_tools + diagram_tools,
     model=bedrock_model,

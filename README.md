@@ -49,7 +49,7 @@ The solution consists of:
 
 ### Architecture Diagram
 
-![AWS Cloud Engineer Agent Architecture](./aws_cloud_engineer_agent_architecture.png)
+![AWS Cloud Engineer Agent Architecture](./aws_cloudEngineerAgent_architecture.png)
 
 ## Local Development
 
@@ -98,9 +98,9 @@ You can run the application in two ways:
    streamlit run app.py
    ```
 
-2. **Direct execution** (if you want to run cloud_engineer_agent.py directly)
+2. **Direct execution** (if you want to run cloudEngineerAgent.py directly)
    ```
-   python cloud_engineer_agent.py
+   python cloudEngineerAgent.py
    ```
 
 #### Windows Configuration
@@ -242,7 +242,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Important Update for Windows Users
 
-The code has been updated to handle the issue with running `cloud_engineer_agent.py` directly on Windows. The following changes have been made:
+The code has been updated to handle the issue with running `cloudEngineerAgent.py` directly on Windows. The following changes have been made:
 
 1. Added robust error handling for MCP client initialization
 2. Implemented a fallback mechanism when MCP tools are not available
@@ -259,12 +259,12 @@ The recommended way to run the application is still using Streamlit:
 streamlit run app.py
 ```
 
-### Option 2: Running cloud_engineer_agent.py Directly
+### Option 2: Running cloudEngineerAgent.py Directly
 
-You can now run the cloud_engineer_agent.py script directly:
+You can now run the cloudEngineerAgent.py script directly:
 
 ```
-python cloud_engineer_agent.py
+python cloudEngineerAgent.py
 ```
 
 The script will:
@@ -308,7 +308,7 @@ If you continue to experience issues, please provide:
 
 
 
-set AWS_REGION=us-west-2&& python cloud_engineer_agent.py
+set AWS_REGION=us-west-2&& python cloudEngineerAgent.py
 streamlit run app.py
 
 
@@ -316,3 +316,7 @@ streamlit run app.py
 streamlit run prodSupportAgent.py
 
 How many invocations were there in the last 5 hour for Lambda production-lambda-hybrid-recording-user-sync and were there any failures
+
+
+How much does it cost to scan a file through Guard Duty, for example, a file that weighs 5 MB, and if I have a lot of files, how can I save on scanning ..
+is there diff in prise 5 file of 20 mb VS 1 file of 20mb ?

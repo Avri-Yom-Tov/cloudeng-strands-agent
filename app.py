@@ -1,5 +1,5 @@
 import streamlit as st
-from cloud_engineer_agent import execute_predefined_task, execute_custom_task, get_predefined_tasks, PREDEFINED_TASKS, mcp_initialized
+from cloudEngineerAgent import execute_predefined_task, execute_custom_task, get_predefined_tasks, PREDEFINED_TASKS, mcp_initialized
 import time
 import re
 import json
@@ -17,7 +17,7 @@ st.set_page_config(
 @st.cache_resource
 def get_agent_functions():
     # This is just a placeholder to maintain the caching behavior
-    # The actual agent is now initialized directly in cloud_engineer_agent.py
+    # The actual agent is now initialized directly in cloudEngineerAgent.py
     return True
 
 # Function to remove thinking process from response and handle formatting
