@@ -1,0 +1,1758 @@
+{
+    "widgets": [
+        {
+            "type": "text",
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 4,
+            "properties": {
+                "markdown": "# Interactions Store and Forward Dashboard\n\n## resources\n\nbutton:primary:unzip lambda \nbutton:primary:unzip SF \nbutton:primary:rules SF \nbutton:primary:Media SF\nbutton:primary:adapter SF\nbutton:primary:metadata enrichment SF",
+                "background": "transparent"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 4,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "## Step functions status"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 6,
+            "width": 3,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-livevox-unzip-file",
+                        {
+                            "id": "m0",
+                            "label": "STARTED",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "id": "m1",
+                            "color": "#2ca02c",
+                            "region": "us-west-2",
+                            "label": "SUCCEEDED"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "id": "m2",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m3",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m4",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m2,m3,m4])",
+                            "label": "FAILED",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "setPeriodToTimeRange": true,
+                "title": "Unzip SF"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 3,
+            "y": 6,
+            "width": 3,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-snf-LiveVoxRulesStateMachine",
+                        {
+                            "id": "m0",
+                            "label": "STARTED",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "id": "m1",
+                            "color": "#2ca02c",
+                            "region": "us-west-2",
+                            "label": "SUCCEEDED"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "id": "m2",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m3",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m4",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m2,m3,m4])",
+                            "label": "FAILED",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "setPeriodToTimeRange": true,
+                "title": "Rules SF"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 23,
+            "width": 24,
+            "height": 4,
+            "properties": {
+                "query": "SOURCE '/aws/lambda/production-rec-lambda-snf-media-upload' | SOURCE '/aws/lambda/production-rec-lambda-snf-metadata-preparation' | SOURCE '/aws/lambda/production-rec-lambda-snf-metadata-upload' | filter @message like \"Finished preparing with source\"\n| parse @message \"Finished preparing with source *, traceId: *, tenant: *, tenantName: , voice count: , screen count: ,\" \n as source,traceId,tenantId,tenantName,voiceCount,screenCount\n| stats\n count() as EntryCount\n by tenantId as Tenant ID, tenantName as Tenant Name",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Media Upload Source Preparation",
+                "view": "table"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 20,
+            "width": 24,
+            "height": 3,
+            "properties": {
+                "query": "SOURCE '/aws/lambda/production-rec-lambda-snf-livevox-unzip-file' | filter @message like \", file type received:\"\n| parse @message \"🔍tenant id: , file type received: \" as tenantId, fileType\n| stats\n sum(if( trim(fileType) = \"mp3\", 1, 0)) as Voice Count (MP3),\n sum(if( trim(fileType) = \"csv\", 1, 0)) as Metadata Count (CSV),\n sum(if( trim(fileType) = \"webm\", 1, 0)) as Screen Count (WEBM),\n sum(if( trim(fileType) not in [ \"mp3\", \"csv\", \"webm\"], 1, 0)) as Invalid Types Count,\n count() as Total_Files,\n (100 * (Total_Files - sum(if( trim(fileType) not in [ \"mp3\", \"csv\", \"webm\"], 1, 0))) / Total_Files) as Success_Percentage\n by tenantId",
+                "queryLanguage": "CWLI",
+                "region": "us-west-2",
+                "title": "Unzip files",
+                "view": "table"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 17,
+            "width": 24,
+            "height": 3,
+            "properties": {
+                "query": "SOURCE '/aws/lambda/production-rec-lambda-snf-livevox-unzip-file' | filter @message like \"Error in lambdaHandler,\"\n| parse @message \"tenantId:, jobId:, with error\" as tenantId,jobId,error\n| stats count() as count by tenantId, error",
+                "queryLanguage": "CWLI",
+                "region": "us-west-2",
+                "title": "Unzip errors",
+                "view": "table"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 27,
+            "width": 24,
+            "height": 6,
+            "properties": {
+                "query": "SOURCE '/aws/lambda/production-rec-lambda-snf-media-upload' | SOURCE '/aws/lambda/production-rec-lambda-snf-metadata-preparation' | SOURCE '/aws/lambda/production-rec-lambda-snf-metadata-upload' | filter\n\n\n\n @message like \"Received segment with source\"\n\n\n\n or @message like \"Segment failed with source\"\n\n\n\n or @message like \"Failed to upload segmentMetadata with source\"\n\n\n\n or @message like \"Successfully uploaded media with source\"\n\n\n\n or @message like \"Failed to upload media with source\"\n\n\n\n| parse @message \"Received segment with source *, traceId: *,tenant: *, tenantName: *, voice count: *, screen count: *\" as prepareInputsource, prepareInputTraceId,prepareInputTenantId,prepareInputTenantName, prepareInputVoiceCount, prepareInputScreenCount\n| parse @message \"Segment failed with source *, traceId: *, tenant: *, tenantName: *, voice count: *, screen count: *\" as preparedFailureSource,preparedSuccessTraceId,preparedFailureTenatId,preparedFailureTenatName,prepareFailureVoiceCount, prepareFailureScreenCount\n| parse @message \"Failed to upload segmentMetadata with source *, traceId: *, tenant: , tenantName: , voice count:, screen count:\" as metadataFailureSource,metadataInputTraceId,metadataFailureTenantId,metadataFailureTenantName,metadataFailureVoiceCount, metadataFailureScreenCount\n| parse @message \"Successfully uploaded media with source *, traceId: *, tenant: *, tenantName: *, voice count: *, screen count: *\" as mediaSuccessSource,mediaSuccessTraceId,mediaSuccessTenantId,mediaSuccessTenantName,mediaSuccessVoiceCount,mediaSuccessScreenCount\n| parse @message \"Failed to upload media with source *, traceId: *,tenant: *, tenantName: *, voice count: *, screen count: *\" as mediaFailureMediaSource,mediaFailureTraceId,mediaFailureTenantId,mediaFailureTenantName,mediaFailureVoiceCount,mediaFailureScreenCount\n| stats\n\n\n\n floor(coalesce(sum(prepareInputVoiceCount),0)) as Input Voice Count,\n\n\n\n floor(coalesce(sum(mediaSuccessVoiceCount),0)) as Output Voice Count,\n\n\n\n floor(coalesce(sum(prepareInputScreenCount),0)) as Input Screen Count,\n\n\n\n floor(coalesce(sum(mediaSuccessScreenCount),0)) as Output Screen Count,\n\n\n\n floor(coalesce(sum(prepareFailureVoiceCount),0)\n\n+ coalesce(sum(metadataFailureVoiceCount),0) + coalesce(sum(mediaFailureVoiceCount),0)) as Total Voice Failure Count,\n\n\n\n floor(coalesce(sum(prepareFailureScreenCount),0)\n\n+ coalesce(sum(metadataFailureScreenCount),0) + coalesce(sum(mediaFailureScreenCount),0)) as Total Screen Failure Count,\n\n\n\n round(100 * (coalesce(sum(mediaSuccessVoiceCount),0))\n\n/ (coalesce(sum(prepareInputVoiceCount),0) + (coalesce(sum(prepareInputVoiceCount),0) = 0)), 2) as Voice Success Rate (%),\n\n\n\n round(100 * (coalesce(sum(mediaSuccessScreenCount),0))\n\n/ (coalesce(sum(prepareInputScreenCount),0) + (coalesce(sum(prepareInputScreenCount),0) = 0)), 2) as Screen Success Rate (%)\n\n\n\n by\n\ncoalesce(prepareInputTenantId,preparedSuccessTenantId,preparedFailureTenatId,mediaInputTenantId,mediaSuccessTenantId,mediaFailureTenantId\n metadataInputTenantId, metadataSuccessTenantId, metadataFailureTenantId) as\nTenant ID, \n\ncoalesce(prepareInputTraceId, preparedSuccessTraceId, preparedFailureTraceId, metadataInputTraceId, metadataSuccessTraceId, metadataFailureTraceId, mediaInputTraceId, mediaSuccessTraceId, mediaFailureTraceId) as Trace ID\n\n\n\n | sort Tenant ID asc",
+                "queryLanguage": "CWLI",
+                "region": "us-west-2",
+                "title": "Media upload summary and errors",
+                "view": "table"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 33,
+            "width": 24,
+            "height": 6,
+            "properties": {
+                "query": "SOURCE '/aws/lambda/production-rec-lambda-snf-media-upload' | filter @message like /Successfully uploaded media/\n| parse @message \"Successfully uploaded media with source *, traceId: *, tenant: *, tenantName: *, voice count: *, screen count: , segmentId: , SLA time in milliseconds: \" as Source, TraceId, TenantId, TenantName, Vcount, Scount, segment, slaInMillis \n| stats avg(slaInMillis) / 60000 as Average_SLA_Minutes by TenantId, TenantName, Source\n| display Source, TenantId, TenantName, Average_SLA_Minutes, concat(round((Average_SLA_Minutes / 60 * 100), 0), \"%\") as Relative_to_target_SLA_1_hr\n| sort TenantId, TenantName, Source",
+                "region": "us-west-2",
+                "stacked": false,
+                "view": "table",
+                "title": "Tenants SLA"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 39,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsSucceeded",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-livevox-unzip-file ExecutionsSucceeded"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsStarted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-livevox-unzip-file ExecutionsStarted"
+                        }
+                    ],
+                    [
+                        "AWS/Lambda",
+                        "Invocations",
+                        "FunctionName",
+                        "production-rec-lambda-snf-livevox-unzip-file",
+                        "Resource",
+                        "production-rec-lambda-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2",
+                            "label": "lambda-snf-livevox-unzip-file Invocations"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "unzip processing",
+                "period": 300,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 39,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Errors",
+                        "FunctionName",
+                        "production-rec-lambda-snf-livevox-unzip-file",
+                        "Resource",
+                        "production-rec-lambda-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2",
+                            "label": "lambda-interactions-snf-unzip-file Errors"
+                        }
+                    ],
+                    [
+                        "AWS/States",
+                        "ExecutionsFailed",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-interactions-snf-unzip-file ExecutionsFailed"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-interactions-snf-unzip-file ExecutionsTimedOut"
+                        }
+                    ],
+                    [
+                        "UnRetryableError",
+                        "production-recUnzipFileStateMachineFailure",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "title": "unzip errors",
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 39,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Events",
+                        "Invocations",
+                        "RuleName",
+                        "production-rec-LiveVoxAudioToMediaUploaderSqsRule",
+                        {
+                            "region": "us-west-2",
+                            "label": "AudioToMediaUploaderSqsRule Invocations"
+                        }
+                    ],
+                    [
+                        ".",
+                        "SuccessfulInvocationAttempts",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "AudioToMediaUploaderSqsRule SuccessfulInvocationAttempts"
+                        }
+                    ],
+                    [
+                        ".",
+                        "TriggeredRules",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "AudioToMediaUploaderSqsRule TriggeredRules"
+                        }
+                    ],
+                    [
+                        ".",
+                        "SuccessfulInvocationAttempts",
+                        ".",
+                        "production-rec-LiveVoxScreenToMediaUploaderSqsRule",
+                        {
+                            "region": "us-west-2",
+                            "label": "ScreenToMediaUploaderSqsRule SuccessfulInvocationAttempts"
+                        }
+                    ],
+                    [
+                        ".",
+                        "MatchedEvents",
+                        ".",
+                        "production-rec-LiveVoxAudioToMediaUploaderSqsRule",
+                        {
+                            "region": "us-west-2",
+                            "label": "AudioToMediaUploaderSqsRule MatchedEvents"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-LiveVoxScreenToMediaUploaderSqsRule",
+                        {
+                            "region": "us-west-2",
+                            "label": "ScreenToMediaUploaderSqsRule MatchedEvents"
+                        }
+                    ],
+                    [
+                        ".",
+                        "Invocations",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "ScreenToMediaUploaderSqsRule Invocations"
+                        }
+                    ],
+                    [
+                        ".",
+                        "TriggeredRules",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "ScreenToMediaUploaderSqsRule TriggeredRules"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "title": "Store and Forward media processing",
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Average"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 39,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsSucceeded",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-media-upload",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-media-upload ExecutionsSucceeded"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsStarted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-media-upload ExecutionsStarted"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "media success",
+                "period": 300,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 45,
+            "width": 6,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsFailed",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-media-upload",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-media-upload ExecutionsFailed"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-livevox-unzip-file ExecutionsAborted"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-media-upload",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-media-upload ExecutionsAborted"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "state-machine-snf-media-upload ExecutionsTimedOut"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "media failures metric",
+                "period": 300,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 45,
+            "width": 6,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Throttles",
+                        "FunctionName",
+                        "production-rec-lambda-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-media-upload",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-metadata-upload",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-metadata-preparation",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Sum",
+                "title": "Lambdas Throttles"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 45,
+            "width": 12,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsFailed",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-state-machine-snf-livevox-unzip-file ExecutionsFailed"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-media-upload",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-state-machine-snf-media-upload ExecutionsFailed"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-livevox-unzip-file",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-state-machine-snf-livevox-unzip-file ExecutionsTimedOut"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-state-machine-snf-unzip-file ExecutionsAborted"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-media-upload",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-state-machine-snf-media-upload ExecutionsAborted"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-state-machine-snf-media-upload ExecutionsTimedOut"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "title": "step functions failures ",
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 53,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## Metadata Lambdas\n",
+                "background": "transparent"
+            }
+        },
+        {
+            "type": "alarm",
+            "x": 0,
+            "y": 70,
+            "width": 24,
+            "height": 3,
+            "properties": {
+                "title": "Unzip alarms",
+                "alarms": [
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-livevox-unzip-file-failure-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-livevox-unzip-file-timeout-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-livevox-unzip-file-throttling-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-livevox-unzip-file-timeout-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-livevox-unzip-file-aborted-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-livevox-unzip-file-throttling-alarm"
+                ]
+            }
+        },
+        {
+            "type": "alarm",
+            "x": 0,
+            "y": 73,
+            "width": 24,
+            "height": 3,
+            "properties": {
+                "title": "Media flow",
+                "alarms": [
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-dlq-message-sent-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-invalid-segment-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-failure-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-timeout-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-media-upload-throttling-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-throttling-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-aborted-alarm",
+                    "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-media-upload-timeout-alarm"
+                ]
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 76,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "# Detailed Alarms"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 78,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-lambda-snf-livevox-unzip-file-timeout-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-livevox-unzip-file-timeout-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 78,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-lambda-snf-media-upload-timeout-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-media-upload-timeout-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 78,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-lambda-snf-metadata-preparation-timeout-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-metadata-preparation-timeout-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 84,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-lambda-snf-metadata-upload-timeout-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-lambda-snf-metadata-upload-timeout-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 78,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-state-machine-snf-media-uploader-dlq-message-sent-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-dlq-message-sent-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 84,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-state-machine-snf-media-uploader-invalid-segment-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-media-uploader-invalid-segment-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 84,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-state-machine-snf-livevox-unzip-file-timeout-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-livevox-unzip-file-timeout-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 84,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "title": "production-rec-state-machine-snf-livevox-unzip-file-aborted-alarm",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-state-machine-snf-livevox-unzip-file-aborted-alarm"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 6,
+            "width": 3,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-media-upload",
+                        {
+                            "id": "m0",
+                            "label": "STARTED",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "id": "m1",
+                            "color": "#2ca02c",
+                            "region": "us-west-2",
+                            "label": "SUCCEEDED"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "id": "m2",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m3",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m4",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m2,m3,m4])",
+                            "label": "FAILED",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "setPeriodToTimeRange": true,
+                "title": "Media SF"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 9,
+            "y": 6,
+            "width": 3,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-metadata-adapter",
+                        {
+                            "id": "m0",
+                            "label": "STARTED",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "id": "m1",
+                            "color": "#2ca02c",
+                            "region": "us-west-2",
+                            "label": "SUCCEEDED"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "id": "m2",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m3",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m4",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m2,m3,m4])",
+                            "label": "FAILED",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "setPeriodToTimeRange": true,
+                "title": "Adapter SF"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 6,
+            "width": 3,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-metadata-enrichment",
+                        {
+                            "id": "m0",
+                            "label": "STARTED",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "id": "m1",
+                            "color": "#2ca02c",
+                            "region": "us-west-2",
+                            "label": "SUCCEEDED"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "id": "m2",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m3",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m4",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m2,m3,m4])",
+                            "label": "FAILED",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "setPeriodToTimeRange": true,
+                "title": "Enrichment SF"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 68,
+            "width": 24,
+            "height": 2,
+            "properties": {
+                "markdown": "# Alarms\n",
+                "background": "transparent"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 54,
+            "width": 6,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Throttles",
+                        "FunctionName",
+                        "production-rec-lambda-snf-input-preprocessing",
+                        "Resource",
+                        "production-rec-lambda-snf-input-preprocessing",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-input-preprocessing"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-input-validation",
+                        ".",
+                        "production-rec-lambda-snf-input-validation",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-input-validation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-external-transformation",
+                        ".",
+                        "production-rec-lambda-snf-external-transformation:$LATEST",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-external-transformation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-old-calls-handler",
+                        ".",
+                        "production-rec-lambda-snf-old-calls-handler",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-old-calls-handler"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-business-data-enrichment",
+                        ".",
+                        "production-rec-lambda-snf-business-data-enrichment",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-business-data-enrichment"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-user-enrichment",
+                        ".",
+                        "production-rec-lambda-snf-user-enrichment",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-user-enrichment"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-contact-id-producer",
+                        ".",
+                        "production-rec-lambda-snf-contact-id-producer",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-contact-id-producer"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-metadata-transformer",
+                        ".",
+                        "production-rec-lambda-snf-metadata-transformer",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-metadata-transformer"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-segment-joiner",
+                        ".",
+                        "production-rec-lambda-snf-segment-joiner",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-segment-joiner"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Sum",
+                "title": "Lambdas Throttles"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 54,
+            "width": 6,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Errors",
+                        "FunctionName",
+                        "production-rec-lambda-snf-input-preprocessing",
+                        "Resource",
+                        "production-rec-lambda-snf-input-preprocessing",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-input-preprocessing"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-input-validation",
+                        ".",
+                        "production-rec-lambda-snf-input-validation",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-input-validation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-external-transformation",
+                        ".",
+                        "production-rec-lambda-snf-external-transformation:$LATEST",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-external-transformation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-old-calls-handler",
+                        ".",
+                        "production-rec-lambda-snf-old-calls-handler",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-old-calls-handler"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-business-data-enrichment",
+                        ".",
+                        "production-rec-lambda-snf-business-data-enrichment",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-business-data-enrichment"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-user-enrichment",
+                        ".",
+                        "production-rec-lambda-snf-user-enrichment",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-user-enrichment"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-contact-id-producer",
+                        ".",
+                        "production-rec-lambda-snf-contact-id-producer",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-contact-id-producer"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-metadata-transformer",
+                        ".",
+                        "production-rec-lambda-snf-metadata-transformer",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-metadata-transformer"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-segment-joiner",
+                        ".",
+                        "production-rec-lambda-snf-segment-joiner",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-segment-joiner"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Sum",
+                "title": "Lambdas Failures"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 54,
+            "width": 6,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Duration",
+                        "FunctionName",
+                        "production-rec-lambda-snf-input-preprocessing",
+                        "Resource",
+                        "production-rec-lambda-snf-input-preprocessing",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-input-preprocessing"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-input-validation",
+                        ".",
+                        "production-rec-lambda-snf-input-validation",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-input-validation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-external-transformation",
+                        ".",
+                        "production-rec-lambda-snf-external-transformation:$LATEST",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-external-transformation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-old-calls-handler",
+                        ".",
+                        "production-rec-lambda-snf-old-calls-handler",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-old-calls-handler"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-business-data-enrichment",
+                        ".",
+                        "production-rec-lambda-snf-business-data-enrichment",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-business-data-enrichment"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-user-enrichment",
+                        ".",
+                        "production-rec-lambda-snf-user-enrichment",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-user-enrichment"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-contact-id-producer",
+                        ".",
+                        "production-rec-lambda-snf-contact-id-producer",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-contact-id-producer"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-metadata-transformer",
+                        ".",
+                        "production-rec-lambda-snf-metadata-transformer",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-metadata-transformer"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-snf-segment-joiner",
+                        ".",
+                        "production-rec-lambda-snf-segment-joiner",
+                        {
+                            "region": "us-west-2",
+                            "label": "production-rec-lambda-snf-segment-joiner"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Sum",
+                "title": "Lambdas Durations"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 13,
+            "width": 24,
+            "height": 4,
+            "properties": {
+                "query": "SOURCE '/aws/lambda/production-rec-lambda-snf-input-preprocessing' | SOURCE '/aws/vendedlogs/states/production-rec-state-machine-snf-media-uploader' | filter ((details.resource like /putMetricData/ and type like /TaskScheduled/) or @message like /Preprocessing completed successfully\\./) \n| parse details.parameters '\"Name\":\"Tenant\",\"Value\":\"\"' as tenantId1 \n| parse details.parameters '\"Name\":\"Source\",\"Value\":\"\"' as source1 \n| parse details.parameters '\"MetricName\":\"smart-reach-output-segment-count\",\"Value\":}' as outputSegmentsMetrics \n| parse @message \"Preprocessing completed successfully. tenantId: *, source: *, segmentsCount: *\" as tenantId2, source2, segmentsCount \n| stats sum(segmentsCount) as inputSegments, \n sum(outputSegmentsMetrics) as outputSegments, \n concat(round(coalesce(sum(outputSegmentsMetrics) / sum(segmentsCount), 0)*100), '%') as successRate \n by coalesce(tenantId1, tenantId2) as tenantId, coalesce(source1, source2) as source",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Metadata Processing Progress",
+                "view": "table"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 62,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        {
+                            "expression": "SEARCH('{ production-rec.service.metrics,Source, StoreAndForward} MetricName=\"production-rec-lambda-snf-external-transformation-invalid-segments-count\"', 'Sum', 86400)",
+                            "label": "",
+                            "id": "e1",
+                            "region": "us-west-2",
+                            "color": "#08aad2",
+                            "period": 86400
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SEARCH('{ production-rec.service.metrics,Source, StoreAndForward} MetricName=\"production-rec-lambda-snf-input-validation-invalid-metadata-input\"', 'Sum', 86400)",
+                            "label": "",
+                            "id": "e2",
+                            "region": "us-west-2",
+                            "color": "#08aad2",
+                            "period": 86400
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SEARCH('{ production-rec.service.metrics,Source, StoreAndForward} MetricName=\"production-rec-metadata-infra-sf-segment-submit-failed\"', 'Sum', 86400)",
+                            "label": "",
+                            "id": "e3",
+                            "region": "us-west-2",
+                            "period": 86400
+                        }
+                    ],
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-metadata-infra-sf-duplicated-segments",
+                        "StoreAndForward",
+                        "production-rec-state-machine-snf-metadata-enrichment",
+                        {
+                            "id": "m1",
+                            "region": "us-west-2",
+                            "stat": "Sum"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-lambda-snf-old-calls-handler-old-call-received",
+                        ".",
+                        "production-rec-lambda-snf-old-calls-handler",
+                        {
+                            "id": "m2",
+                            "region": "us-west-2",
+                            "stat": "Sum"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-metadata-infra-sf-segment-submit-failed",
+                        ".",
+                        "production-rec-state-machine-snf-metadata-enrichment",
+                        {
+                            "id": "m3",
+                            "region": "us-west-2",
+                            "stat": "Sum"
+                        }
+                    ]
+                ],
+                "sparkline": false,
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Average",
+                "period": 86400,
+                "setPeriodToTimeRange": true,
+                "title": "Metadata Discrepancies",
+                "table": {
+                    "summaryColumns": [
+                        "SUM"
+                    ],
+                    "showTimeSeriesData": false,
+                    "stickySummary": true
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 54,
+            "width": 6,
+            "height": 8,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Invocations",
+                        "FunctionName",
+                        "production-rec-lambda-snf-contact-id-producer",
+                        {
+                            "region": "us-west-2",
+                            "color": "#1f77b4",
+                            "label": "contact-id-producer lambda Invocations"
+                        }
+                    ],
+                    [
+                        ".",
+                        "Errors",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "contact-id-producer lambda Errors"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "SNF Contact ID Producer Statistics",
+                "period": 300,
+                "stat": "Sum"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 62,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [
+                        "SyntheticMonitors",
+                        "Failures",
+                        "TestName",
+                        "livevox-snf-synthetic-monitor"
+                    ]
+                ],
+                "region": "us-west-2",
+                "title": "SNF Synthetic Monitor"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 62,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [
+                        "AWS/SQS",
+                        "ApproximateAgeOfOldestMessage",
+                        "QueueName",
+                        "production-rec-snf-metadata-infra-sqs",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "NumberOfMessagesDeleted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "NumberOfMessagesReceived",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "region": "us-west-2",
+                "title": "snf-metadata-infra-sqs",
+                "period": 300
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 90,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## License manager"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 91,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-snf-license-manager-SQSAgeOfOldestMessage-alarm-warning"
+                    ]
+                },
+                "region": "us-west-2",
+                "title": "Approximate Age Of Oldest Message - license manager"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 91,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-lambda-snf-saas-license-manager-number-of-tenants-in-list",
+                        "RoleName",
+                        "production-rec-SNFCrossAccountS3Role",
+                        "StoreAndForward",
+                        "production-rec-lambda-snf-saas-license-manager",
+                        {
+                            "region": "us-west-2",
+                            "label": "license-manager-number-of-tenants-in-list"
+                        }
+                    ]
+                ],
+                "sparkline": false,
+                "view": "singleValue",
+                "region": "us-west-2",
+                "period": 300,
+                "stat": "Average",
+                "setPeriodToTimeRange": false,
+                "title": "license-manager-number-of-tenants-in-list"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 16,
+            "y": 91,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "title": "license-manager-lambda-errors",
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Errors",
+                        "FunctionName",
+                        "production-rec-lambda-snf-saas-license-manager"
+                    ],
+                    [
+                        ".",
+                        "Throttles",
+                        ".",
+                        "."
+                    ]
+                ],
+                "region": "us-west-2"
+            }
+        }
+    ]
+}

@@ -543,10 +543,10 @@ def generate_applink_daily_report(conversation_history=None) -> tuple:
 
         # Read dashboard file
         try:
-            with open('dashboard/applinkProd.json', 'r', encoding='utf-8') as f:
+            with open('dashboard/applink.json', 'r', encoding='utf-8') as f:
                 dashboard_content = f.read()
         except FileNotFoundError:
-            return "Error: dashboard/applinkProd.json not found.", conversation_history or []
+            return "Error: dashboard/applink.json not found.", conversation_history or []
 
         full_prompt = f"{prompt_content}\n\nHere is the dashboard configuration (applink-prod-dashboard.json):\n```json\n{dashboard_content}\n```"
         
@@ -627,135 +627,231 @@ if __name__ == "__main__":
 
     st.set_page_config(page_title="Production Support", page_icon="🔧", layout="wide")
 
-   
+    # Custom CSS for modern, soft design
+    st.markdown("""
+        <style>
+        .main-header {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        .sub-header {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+        .report-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 1rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .report-card h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .report-card p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        .quick-action {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        .quick-action:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status-ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-working {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    st.title("🔧 AWS Production Support")
+    # Initialize MCP clients only once in session state
+    if "mcp_initialized" not in st.session_state:
+        with st.spinner("🔧 Initializing AWS MCP clients..."):
+            initialize_mcp_clients()
+            st.session_state.bedrock_model = get_bedrock_model()
+            st.session_state.system_prompt = get_system_prompt()
+            st.session_state.agent = Agent(
+                tools=time_tools + cloudwatch_tools,
+                model=st.session_state.bedrock_model,
+                system_prompt=st.session_state.system_prompt
+            )
+            st.session_state.mcp_initialized = True
 
+    # Initialize session state for UI messages (for display)
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Initialize session state for agent conversation history (Bedrock format)
+    if "agent_messages" not in st.session_state:
+        st.session_state.agent_messages = []
+
+    # Sidebar with modern design
     with st.sidebar:
-        st.header("Reports")
-        if st.button("Generate AppLink Daily Report", type="primary"):
-            # Add user message to UI history
+        st.markdown("### 📊 Reports & Actions")
+        st.markdown("---")
+        
+        # Daily Report Section
+        st.markdown("#### 📅 Daily Report")
+        if st.button("🚀 Generate AppLink Report", type="primary", use_container_width=True):
+            st.session_state.generating_report = True
             st.session_state.messages.append({"role": "user", "content": "Generate AppLink Daily Report"})
-            
-            # Run the report generation
-            with st.spinner("Generating AppLink Daily Report... (This may take a minute)"):
-                response, updated_agent_messages = generate_applink_daily_report(
-                    conversation_history=st.session_state.agent_messages
-                )
-                cleaned_response = clean_response(response)
-                
-                # Update histories
+            st.rerun()
+        
+        st.markdown("---")
+        
+        # Quick Actions
+        st.markdown("#### ⚡ Quick Actions")
+        
+        quick_actions = {
+            "🔍 Lambda Errors": "Check for Lambda function errors and failures in the last hour",
+            "⚠️ CloudWatch Alarms": "Check current CloudWatch alarms status",
+            "📈 Performance Metrics": "Get performance metrics for Lambda functions"
+        }
+        
+        for label, task in quick_actions.items():
+            if st.button(label, use_container_width=True):
+                st.session_state.messages.append({"role": "user", "content": task})
+                with st.chat_message("user"):
+                    st.markdown(task)
+                with st.chat_message("assistant"):
+                    with st.spinner("🔍 Analyzing..."):
+                        response, updated_agent_messages = execute_custom_task(
+                            task,
+                            conversation_history=st.session_state.agent_messages
+                        )
+                        cleaned_response = clean_response(response)
+                        st.markdown(cleaned_response)
                 st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
                 st.session_state.agent_messages = updated_agent_messages
                 st.rerun()
-   
+        
+        st.markdown("---")
+        
+        # System Status
+        st.markdown("#### 💡 System Status")
+        st.success("✓ MCP Clients Ready")
+        st.info(f"Region: {AWS_REGION}")
+        st.info(f"Profile: {AWS_PROFILE_FOR_TOOLS}")
+        
+        st.markdown("---")
+        
+        if st.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.agent_messages = []
+            st.rerun()
 
-    # Initialize MCP clients only once in session state
+    # Main content
+    st.markdown('<div class="main-header">🔧 AWS Production Support</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Monitor, analyze, and manage your AWS production environment</div>', unsafe_allow_html=True)
 
-    if "mcp_initialized" not in st.session_state:
-
-        with st.spinner("🔧 Initializing AWS MCP clients..."):
-
-            initialize_mcp_clients()
-
-            st.session_state.bedrock_model = get_bedrock_model()
-
-            st.session_state.system_prompt = get_system_prompt()
-
-            st.session_state.agent = Agent(
-
-                tools=time_tools + cloudwatch_tools,
-
-                model=st.session_state.bedrock_model,
-
-                system_prompt=st.session_state.system_prompt
-
-            )
-
-            st.session_state.mcp_initialized = True
-
-   
-
-    # Initialize session state for UI messages (for display)
-
-    if "messages" not in st.session_state:
-
-        st.session_state.messages = []
-
-   
-
-    # Initialize session state for agent conversation history (Bedrock format)
-
-    if "agent_messages" not in st.session_state:
-
-        st.session_state.agent_messages = []
-
-   
-
-    # Display welcome message if no messages yet
-
-    if not st.session_state.messages:
-
-        with st.chat_message("assistant"):
-
-            st.markdown("👋 Ask me about Lambda invocations, errors, CloudWatch metrics, etc.")
-
-   
-
-    # Display all previous messages
-
-    for message in st.session_state.messages:
-
-        with st.chat_message(message["role"]):
-
-            st.markdown(message["content"])
-
-   
-
-    # Handle new user input
-
-    if prompt := st.chat_input("Ask about production metrics..."):
-
-        # Add user message to UI history
-
-        st.session_state.messages.append({"role": "user", "content": prompt})
-
-       
-
+    # Handle report generation with progress
+    if st.session_state.get("generating_report", False):
+        st.session_state.generating_report = False
+        
         with st.chat_message("user"):
-
-            st.markdown(prompt)
-
-       
-
-        # Get response from agent with conversation history
-
+            st.markdown("Generate AppLink Daily Report")
+        
         with st.chat_message("assistant"):
-
-            with st.spinner("🔍 Analyzing CloudWatch metrics..."):
-
-                response, updated_agent_messages = execute_custom_task(
-
-                    prompt,
-
-                    conversation_history=st.session_state.agent_messages
-
-                )
-
-                cleaned_response = clean_response(response)
-
-                st.markdown(cleaned_response)
-
-       
-
-        # Update both histories
-
+            progress_placeholder = st.empty()
+            status_placeholder = st.empty()
+            
+            progress_placeholder.progress(0.2)
+            status_placeholder.info("📊 Collecting CloudWatch metrics...")
+            
+            response, updated_agent_messages = generate_applink_daily_report(
+                conversation_history=st.session_state.agent_messages
+            )
+            
+            progress_placeholder.progress(0.8)
+            status_placeholder.info("📝 Generating comprehensive report...")
+            
+            cleaned_response = clean_response(response)
+            
+            progress_placeholder.progress(1.0)
+            status_placeholder.success("✅ Report generated successfully!")
+            
+            st.markdown(cleaned_response)
+        
         st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
-
         st.session_state.agent_messages = updated_agent_messages
 
-       
+    # Display welcome message if no messages yet
+    if not st.session_state.messages:
+        with st.chat_message("assistant"):
+            st.markdown("""
+            👋 **Welcome to AWS Production Support!**
+            
+            I can help you with:
+            - 📊 Generate comprehensive daily reports
+            - 🔍 Analyze Lambda invocations and errors
+            - ⚠️ Check CloudWatch alarms
+            - 📈 Review performance metrics
+            - 🔎 Investigate error patterns
+            
+            Use the sidebar for quick actions or ask me anything about your production environment.
+            """)
 
+    # Display all previous messages
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Handle new user input
+    if prompt := st.chat_input("💬 Ask about production metrics, errors, alarms..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        with st.chat_message("assistant"):
+            progress_placeholder = st.empty()
+            status_placeholder = st.empty()
+            
+            progress_placeholder.progress(0.3)
+            status_placeholder.info("🔍 Analyzing CloudWatch metrics...")
+            
+            response, updated_agent_messages = execute_custom_task(
+                prompt,
+                conversation_history=st.session_state.agent_messages
+            )
+            
+            progress_placeholder.progress(0.9)
+            status_placeholder.info("📝 Preparing response...")
+            
+            cleaned_response = clean_response(response)
+            
+            progress_placeholder.empty()
+            status_placeholder.empty()
+            
+            st.markdown(cleaned_response)
+        
+        st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
+        st.session_state.agent_messages = updated_agent_messages
+        
         st.rerun()
 
 

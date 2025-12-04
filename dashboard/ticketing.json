@@ -1,0 +1,1887 @@
+{
+    "start": "-P14D",
+    "widgets": [
+        {
+            "type": "text",
+            "x": 0,
+            "y": 22,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## **Ticket Metadata Processing Failures**"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 3,
+            "properties": {
+                "markdown": "# SNF Ticketing Dashboard\n## Step Functions Links \n [button:primary:Preprocessing SF](https://us-west-2.console.aws.amazon.com/states/home?region=us-west-2#/statemachines/view/arn%3Aaws%3Astates%3Aus-west-2%3A654654430801%3AstateMachine%3Aproduction-rec-sf-snf-tickets-data-preprocessing?type=standard)  [button:primary:Normalization SF](https://us-west-2.console.aws.amazon.com/states/home?region=us-west-2#/statemachines/view/arn%3Aaws%3Astates%3Aus-west-2%3A654654430801%3AstateMachine%3Aproduction-rec-sf-snf-tickets-metadata-normalization?type=standard)  [button:primary:Enrichment SF](https://us-west-2.console.aws.amazon.com/states/home?region=us-west-2#/statemachines/view/arn%3Aaws%3Astates%3Aus-west-2%3A654654430801%3AstateMachine%3Aproduction-rec-state-machine-ticket-metadata-enrichment?type=express) \n \n \n"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 13,
+            "y": 38,
+            "width": 10,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing",
+                        {
+                            "id": "m12",
+                            "label": "Preprocess ExecutionsStarted",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "id": "m13",
+                            "label": "Preprocess ExecutionsSucceeded",
+                            "region": "us-west-2",
+                            "color": "#69ae34"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m14,m15,m16])",
+                            "label": "Preprocess Executions Failures",
+                            "id": "e3",
+                            "region": "us-west-2",
+                            "color": "#d62728"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "100*(m12/m13)",
+                            "label": "Preprocess success rate (%)",
+                            "id": "e4",
+                            "region": "us-west-2",
+                            "color": "#ffc1d4"
+                        }
+                    ],
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-metadata-normalization",
+                        {
+                            "color": "#1f77b4",
+                            "label": "Normalization ExecutionsStarted",
+                            "region": "us-west-2",
+                            "id": "m4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "color": "#2ca02c",
+                            "label": "Normalization ExecutionsSucceeded",
+                            "region": "us-west-2",
+                            "id": "m5"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m7,m8,m9])",
+                            "label": "Normalization Executions Failures",
+                            "id": "e2",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "100*(m4/m5)",
+                            "label": "Normalization success rate (%)",
+                            "id": "e5",
+                            "region": "us-west-2",
+                            "color": "#ffc1d4"
+                        }
+                    ],
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-ticket-metadata-enrichment",
+                        {
+                            "color": "#1f77b4",
+                            "label": "Enrichment ExecutionsStarted",
+                            "region": "us-west-2",
+                            "id": "m1"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "color": "#2ca02c",
+                            "label": "Enrichment ExecutionsSucceeded",
+                            "region": "us-west-2",
+                            "id": "m2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m3,m10,m11])",
+                            "label": "Enrichment Executions Failures",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "100*(m1/m2)",
+                            "label": "Enrichment success rate (%)",
+                            "id": "e6",
+                            "region": "us-west-2",
+                            "color": "#ffc1d4"
+                        }
+                    ],
+                    [
+                        "AWS/States",
+                        "ExecutionsFailed",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-ticket-metadata-enrichment",
+                        {
+                            "color": "#d62728",
+                            "label": "enrichment ExecutionsFailed",
+                            "region": "us-west-2",
+                            "id": "m3",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-metadata-normalization",
+                        {
+                            "color": "#d62728",
+                            "label": "Normalization ExecutionsFailed",
+                            "region": "us-west-2",
+                            "id": "m6",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m7",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionThrottled",
+                        ".",
+                        ".",
+                        {
+                            "id": "m8",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m9",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-ticket-metadata-enrichment",
+                        {
+                            "id": "m10",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m11",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing",
+                        {
+                            "id": "m14",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m15",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m16",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "singleValue",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Step functions executions processing",
+                "setPeriodToTimeRange": true,
+                "sparkline": false,
+                "trend": false
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 37,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## **Metadata Step Functions Status**\n"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 1,
+            "y": 38,
+            "width": 10,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        {
+                            "expression": "SUM([m8,m9])",
+                            "label": "Preprocess ExecutionsTimedOut",
+                            "id": "e1"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m10,m11])",
+                            "label": "Preprocess ExecutionsFailed",
+                            "id": "e2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m12,m13])",
+                            "label": "Preprocess ExecutionThrottled",
+                            "id": "e3"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m14,m15])",
+                            "label": "Preprocess ExecutionsAborted",
+                            "id": "e4"
+                        }
+                    ],
+                    [
+                        "AWS/States",
+                        "ExecutionsTimedOut",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-metadata-normalization",
+                        {
+                            "label": "Normalization ExecutionsTimedOut",
+                            "region": "us-west-2",
+                            "color": "#1f77b4",
+                            "id": "m1"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "label": "Normalization ExecutionsFailed",
+                            "region": "us-west-2",
+                            "color": "#ff7f0e",
+                            "id": "m2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionThrottled",
+                        ".",
+                        ".",
+                        {
+                            "label": "Normalization ExecutionThrottled",
+                            "region": "us-west-2",
+                            "color": "#2ca02c",
+                            "id": "m3"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "label": "Normalization ExecutionsAborted",
+                            "region": "us-west-2",
+                            "color": "#9467bd",
+                            "id": "m4"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-metadata-enrichment",
+                        {
+                            "label": "Enrichment ExecutionsAborted",
+                            "region": "us-west-2",
+                            "color": "#8c564b",
+                            "id": "m5"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "label": "Enrichment ExecutionsTimedOut",
+                            "region": "us-west-2",
+                            "color": "#e377c2",
+                            "id": "m6"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "label": "Enrichment ExecutionsFailed",
+                            "region": "us-west-2",
+                            "color": "#7f7f7f",
+                            "id": "m7"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing",
+                        {
+                            "id": "m8",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing/batch-s3-json",
+                        {
+                            "id": "m9",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing",
+                        {
+                            "id": "m10",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing/batch-s3-json",
+                        {
+                            "id": "m11",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionThrottled",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing",
+                        {
+                            "id": "m12",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing/batch-s3-json",
+                        {
+                            "id": "m13",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing",
+                        {
+                            "id": "m14",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-data-preprocessing/batch-s3-json",
+                        {
+                            "id": "m15",
+                            "visible": false
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Throttled/Aborted/Failed/TimedOut"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 3,
+            "width": 18,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-lambda-ticket-preprocessing-number-of-received-tickets",
+                        "StoreAndForward",
+                        "production-rec-lambda-ticket-preprocessing",
+                        "Source",
+                        "PLAYVOX",
+                        {
+                            "region": "us-west-2",
+                            "id": "m1",
+                            "label": "Received Tickets"
+                        }
+                    ],
+                    [
+                        "AWS/SQS",
+                        "NumberOfMessagesSent",
+                        "QueueName",
+                        "production-rec-us-west-2-snf-ticket-data-sqs",
+                        {
+                            "label": "Passed Preproccesing",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-snf-valid-ticket-metadata-sqs",
+                        {
+                            "region": "us-west-2",
+                            "id": "m2",
+                            "label": "Passed Normalization"
+                        }
+                    ],
+                    [
+                        ".",
+                        "NumberOfMessagesReceived",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "id": "m3",
+                            "label": "Recieved in Enrichment"
+                        }
+                    ],
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-state-machine-ticket-metadata-enrichment-successful-tickets",
+                        "StoreAndForward",
+                        "production-rec-state-machine-ticket-metadata-enrichment",
+                        {
+                            "region": "us-west-2",
+                            "id": "m4",
+                            "label": "Passed Enrichment"
+                        }
+                    ],
+                    [
+                        "AWS/SQS",
+                        "NumberOfMessagesSent",
+                        "QueueName",
+                        "production-rec-snf-ticket-metadata-decoration-sqs",
+                        {
+                            "region": "us-west-2",
+                            "id": "m5",
+                            "label": "Sent to Decoration"
+                        }
+                    ]
+                ],
+                "sparkline": false,
+                "view": "table",
+                "region": "us-west-2",
+                "table": {
+                    "layout": "vertical",
+                    "summaryColumns": [
+                        "SUM"
+                    ],
+                    "showTimeSeriesData": false,
+                    "stickySummary": true
+                },
+                "stat": "Sum",
+                "period": 300,
+                "yAxis": {
+                    "left": {
+                        "showUnits": false
+                    }
+                },
+                "title": "Ticket Metadata Processing Summary",
+                "singleValueFullPrecision": true,
+                "liveData": false
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 16,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-lambda-ticket-preprocessing-number-of-received-tickets",
+                        "StoreAndForward",
+                        "production-rec-lambda-ticket-preprocessing",
+                        "Source",
+                        "PLAYVOX",
+                        {
+                            "label": "Received Tickets",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        "AWS/SQS",
+                        "NumberOfMessagesSent",
+                        "QueueName",
+                        "production-rec-us-west-2-snf-ticket-data-sqs",
+                        {
+                            "label": "Passed Preprocessing",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "NumberOfMessagesReceived",
+                        ".",
+                        ".",
+                        {
+                            "label": "Received Normalization",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "NumberOfMessagesSent",
+                        ".",
+                        "production-rec-snf-valid-ticket-metadata-sqs",
+                        {
+                            "label": "Passed Normalization",
+                            "region": "us-west-2",
+                            "color": "#2ca02c"
+                        }
+                    ],
+                    [
+                        ".",
+                        "NumberOfMessagesReceived",
+                        ".",
+                        ".",
+                        {
+                            "label": "Received in Enrichment",
+                            "region": "us-west-2",
+                            "color": "#ff7f0e"
+                        }
+                    ],
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-state-machine-ticket-metadata-enrichment-successful-tickets",
+                        "StoreAndForward",
+                        "production-rec-state-machine-ticket-metadata-enrichment",
+                        {
+                            "label": "Passed Enrichment",
+                            "region": "us-west-2",
+                            "color": "#9467bd"
+                        }
+                    ],
+                    [
+                        "AWS/SQS",
+                        "NumberOfMessagesSent",
+                        "QueueName",
+                        "production-rec-snf-ticket-metadata-decoration-sqs",
+                        {
+                            "region": "us-west-2",
+                            "label": "Sent to Decoration",
+                            "color": "#17becf"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Ticket Metadata Processing Summary Graph"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 72,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## **Ticket Processing**\n"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 30,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "production-rec.service.metrics",
+                        "userNotFoundInCache",
+                        "StoreAndForward",
+                        "production-rec-lambda-ticket-user-id-mapper",
+                        {
+                            "id": "m1",
+                            "visible": false,
+                            "region": "us-west-2",
+                            "color": "#e377c2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "DDBConnectionFailure",
+                        ".",
+                        ".",
+                        {
+                            "id": "m2",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "LambdaTicketSegmentIdMapper-number-of-failed-ddb-connection-tries",
+                        ".",
+                        "LambdaTicketSegmentIdMapper",
+                        {
+                            "id": "m3",
+                            "label": "Segments mapping errors",
+                            "region": "us-west-2",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m1, m2])",
+                            "label": "User mapping errors",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Ticket Metadata Enrichment Retryable Errors"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 15,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## **Metadata Summary**"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 16,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-lambda-ticket-metadata-input-validation-ticket-schema-validation-failure",
+                        "StoreAndForward",
+                        "production-rec-lambda-ticket-metadata-input-validation",
+                        "Source",
+                        "PLAYVOX",
+                        {
+                            "label": "Schema validation failure",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-tickets-with-missing-transcript",
+                        ".",
+                        "ticket-data-preprocessing-sf",
+                        {
+                            "label": "Missing transcript",
+                            "color": "#A76F63",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-lambda-ticket-metadata-transform-ticket-transformation-failure",
+                        ".",
+                        "production-rec-lambda-ticket-metadata-transform",
+                        "Source",
+                        "PLAYVOX",
+                        {
+                            "region": "us-west-2",
+                            "label": "Transformation failure",
+                            "color": "#fe6e73"
+                        }
+                    ],
+                    [
+                        "AWS/SQS",
+                        "NumberOfMessagesSent",
+                        "QueueName",
+                        "production-rec-snf-ticket-metadata-decoration-sqs",
+                        {
+                            "region": "us-west-2",
+                            "label": "Successfully sent to decoration",
+                            "color": "#69ae34"
+                        }
+                    ]
+                ],
+                "view": "pie",
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "setPeriodToTimeRange": true,
+                "sparkline": false,
+                "trend": false,
+                "title": "Success/Failed Tickets Output"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 73,
+            "width": 8,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Throttles",
+                        "FunctionName",
+                        "production-rec-lambda-ticket-preprocessing",
+                        {
+                            "color": "#1f77b4",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-preprocessing"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-metadata-input-validation",
+                        {
+                            "color": "#ff7f0e",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-metadata-input-validation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-metadata-transform",
+                        {
+                            "color": "#8c564b",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-metadata-transform"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-user-id-mapper",
+                        {
+                            "color": "#2ca02c",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-user-id-mapper"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-segment-id-mapper",
+                        {
+                            "color": "#9467bd",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-segment-id-mapper"
+                        }
+                    ],
+                    [
+                        ".",
+                        ".",
+                        ".",
+                        "production-rec-lambda-ticket-transcript-aggregation",
+                        "Resource",
+                        "production-rec-lambda-ticket-transcript-aggregation:$LATEST",
+                        {
+                            "label": "lambda-ticket-transcript-aggregation"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Metadata Lambdas Throttles"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 23,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Errors",
+                        "FunctionName",
+                        "production-rec-lambda-ticket-preprocessing",
+                        {
+                            "color": "#1f77b4",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-preprocessing"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-metadata-input-validation",
+                        {
+                            "color": "#ff7f0e",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-metadata-input-validation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-metadata-transform",
+                        {
+                            "color": "#2ca02c",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-metadata-transform"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-user-id-mapper",
+                        {
+                            "color": "#8c564b",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-user-id-mapper"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-segment-id-mapper",
+                        {
+                            "color": "#9467bd",
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-segment-id-mapper"
+                        }
+                    ],
+                    [
+                        ".",
+                        ".",
+                        ".",
+                        "production-rec-lambda-ticket-transcript-aggregation",
+                        "Resource",
+                        "production-rec-lambda-ticket-transcript-aggregation:$LATEST",
+                        {
+                            "label": "lambda-ticket-transcript-aggregation"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Metadata Lambdas Errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 18,
+            "y": 3,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        "SyntheticMonitors",
+                        "Failures",
+                        "TestName",
+                        "playvox_sm_test_s3_chat",
+                        {
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "SM Failures"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 65,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## **Metadata Alarms**"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 73,
+            "width": 7,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Duration",
+                        "FunctionName",
+                        "production-rec-lambda-ticket-metadata-transform",
+                        {
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-metadata-transform"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-preprocessing",
+                        {
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-preprocessing"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-metadata-input-validation",
+                        {
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-metadata-input-validation"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-user-id-mapper",
+                        {
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-user-id-mapper"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-segment-id-mapper",
+                        {
+                            "region": "us-west-2",
+                            "label": "lambda-ticket-segment-id-mapper"
+                        }
+                    ],
+                    [
+                        ".",
+                        ".",
+                        ".",
+                        "production-rec-lambda-ticket-transcript-aggregation",
+                        "Resource",
+                        "production-rec-lambda-ticket-transcript-aggregation:$LATEST",
+                        {
+                            "label": "lambda-ticket-transcript-aggregation"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Average",
+                "period": 300,
+                "title": "Metadata Lambdas Duration"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 15,
+            "y": 73,
+            "width": 9,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Invocations",
+                        "FunctionName",
+                        "production-rec-lambda-ticket-user-id-mapper",
+                        {
+                            "label": "lambda-ticket-user-id-mapper",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-segment-id-mapper",
+                        {
+                            "label": "lambda-ticket-segment-id-mapper",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-preprocessing",
+                        {
+                            "label": "lambda-ticket-preprocessing",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-metadata-transform",
+                        {
+                            "label": "lambda-ticket-metadata-transform",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-metadata-input-validation",
+                        {
+                            "label": "lambda-ticket-metadata-input-validation",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "production-rec-lambda-ticket-transcript-aggregation",
+                        {
+                            "label": "lambda-ticket-transcript-aggregation"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Metadata Lambdas Invocations"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 45,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## **Media Step Functions Status**\n"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 46,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsTimedOut",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-transcript-generator",
+                        {
+                            "region": "us-west-2",
+                            "label": "ExecutionsTimedOut"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "ExecutionsAborted"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "ExecutionsFailed"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-orchestrator",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionThrottled",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Transcript Generator ERRORS - Throttled/Aborted/Failed/TimedOut"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 46,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsTimedOut",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-orchestrator",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsFailed",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionThrottled",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Orchestrator ERRORS - Throttled/Aborted/Failed/TimedOut"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 61,
+            "width": 12,
+            "height": 4,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-orchestrator",
+                        {
+                            "color": "#1f77b4",
+                            "label": "Orchestrator ExecutionsStarted",
+                            "region": "us-west-2",
+                            "id": "m1"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "color": "#2ca02c",
+                            "label": "Orchestrator ExecutionsSucceeded",
+                            "region": "us-west-2",
+                            "id": "m2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m7,m8,m9])",
+                            "label": "Orchestrator Executions Failures (Timeout/Throttled/Aborted)",
+                            "id": "e1",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "100*(m2/m1)",
+                            "label": "Orchestrator Proccess Success %",
+                            "id": "e3",
+                            "region": "us-west-2",
+                            "color": "#e377c2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "100*(e1/(m2+e1))",
+                            "label": "Orchestrator Proccess Failure %",
+                            "id": "e4",
+                            "region": "us-west-2",
+                            "color": "#7f7f7f",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "AWS/States",
+                        "ExecutionsFailed",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-orchestrator",
+                        {
+                            "color": "#d62728",
+                            "label": "Orchestrator ExecutionsFailed",
+                            "region": "us-west-2",
+                            "id": "m3",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-metadata-normalization",
+                        {
+                            "color": "#d62728",
+                            "label": "Normalization ExecutionsFailed",
+                            "region": "us-west-2",
+                            "id": "m6",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-transcript-generator",
+                        {
+                            "id": "m7",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionThrottled",
+                        ".",
+                        ".",
+                        {
+                            "id": "m8",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m9",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-orchestrator",
+                        {
+                            "id": "m10",
+                            "visible": false,
+                            "region": "us-west-2",
+                            "label": "ExecutionsAborted"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m11",
+                            "visible": false,
+                            "region": "us-west-2",
+                            "label": "ExecutionsTimedOut"
+                        }
+                    ]
+                ],
+                "view": "singleValue",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Orchestrator SF - Executions Metric",
+                "setPeriodToTimeRange": true,
+                "sparkline": false,
+                "trend": false
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 54,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/Lambda",
+                        "Errors",
+                        "FunctionName",
+                        "production-rec-lambda-snf-tickets-transcript-generator",
+                        {
+                            "color": "#d13212",
+                            "label": "Lambda Errors",
+                            "region": "us-west-2",
+                            "yAxis": "left"
+                        }
+                    ],
+                    [
+                        ".",
+                        "Throttles",
+                        ".",
+                        ".",
+                        {
+                            "color": "#1f77b4",
+                            "label": "Lambda Throttles",
+                            "region": "us-west-2"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "SNF Ticket Transcript Generator Lambda Errors",
+                "period": 86400,
+                "width": 1200,
+                "height": 400,
+                "yAxis": {
+                    "left": {
+                        "label": "Count",
+                        "showUnits": false
+                    },
+                    "right": {
+                        "label": "Duration (ms)",
+                        "showUnits": true
+                    }
+                },
+                "stat": "Sum",
+                "legend": {
+                    "position": "bottom"
+                }
+            }
+        },
+        {
+            "type": "log",
+            "x": 12,
+            "y": 54,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "query": "SOURCE '/aws/lambda/production-rec-lambda-snf-tickets-transcript-generator' | fields @timestamp, @message \n| filter level=\"ERROR\" or @message like /(?i)\\bError\\b/ and @message like \"Got Error\"\n| parse @message /Got Error:(?<error_txt>[^\"]+)/ \n| stats\ncount(*) - sum(strcontains(error_txt, \"Cannot convert undefined or null to object\")) - sum(strcontains(error_txt, \"Cannot read properties of undefined\")) - sum(strcontains(error_txt, \"No JSON files found in folderKeyPrefix\")) - sum(strcontains(error_txt, \"Unexpected behavior !\")) - sum(strcontains(error_txt, \"UnRetryableError\")) as other_errors,\nsum(strcontains(error_txt, \"UnRetryableError\")) as unretryable_errors,\nsum(strcontains(error_txt, \"Cannot convert undefined or null to object\")) as cannot_convert_undefined_to_object,\nsum(strcontains(error_txt, \"Cannot read properties of undefined\")) as cannot_read_properties_undefined,\nsum(strcontains(error_txt, \"No JSON files found in folderKeyPrefix\")) as no_json_files_found_folderKeyPrefix,\nsum(strcontains(error_txt, \"Unexpected behavior !\")) as unexpected_behavior,\ncount(*) as total_errors",
+                "region": "us-west-2",
+                "stacked": false,
+                "title": "Transcript Generator General Errors",
+                "view": "table"
+            }
+        },
+        {
+            "type": "text",
+            "x": 0,
+            "y": 53,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "## **Tickets Media processing failures**\n"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 61,
+            "width": 12,
+            "height": 4,
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/States",
+                        "ExecutionsStarted",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-transcript-generator",
+                        {
+                            "color": "#1f77b4",
+                            "label": "Transcript Generator ExecutionsStarted",
+                            "region": "us-west-2",
+                            "id": "m4"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsSucceeded",
+                        ".",
+                        ".",
+                        {
+                            "color": "#2ca02c",
+                            "label": "Transcript Generator ExecutionsSucceeded",
+                            "region": "us-west-2",
+                            "id": "m5"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "SUM([m7,m8,m9])",
+                            "label": "Transcript Generator Executions Failures (Timeout/Throttled/Aborted)",
+                            "id": "e2",
+                            "color": "#d62728",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "100*(m4/m5)",
+                            "label": "Transcript Generator Proccess Success %",
+                            "id": "e5",
+                            "color": "#e377c2",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "100*(e2/(e2+m5))",
+                            "label": "Transcript Generator Proccess Failure %",
+                            "id": "e6",
+                            "color": "#7f7f7f",
+                            "region": "us-west-2",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        "AWS/States",
+                        "ExecutionsFailed",
+                        "StateMachineArn",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-sf-snf-tickets-metadata-normalization",
+                        {
+                            "color": "#d62728",
+                            "label": "Normalization ExecutionsFailed",
+                            "region": "us-west-2",
+                            "id": "m6",
+                            "visible": false
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-transcript-generator",
+                        {
+                            "id": "m7",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionThrottled",
+                        ".",
+                        ".",
+                        {
+                            "id": "m8",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsAborted",
+                        ".",
+                        ".",
+                        {
+                            "id": "m9",
+                            "visible": false,
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        "...",
+                        "arn:aws:states:us-west-2:654654430801:stateMachine:production-rec-state-machine-snf-tickets-orchestrator",
+                        {
+                            "id": "m10",
+                            "visible": false,
+                            "region": "us-west-2",
+                            "label": "ExecutionsAborted"
+                        }
+                    ],
+                    [
+                        ".",
+                        "ExecutionsTimedOut",
+                        ".",
+                        ".",
+                        {
+                            "id": "m11",
+                            "visible": false,
+                            "region": "us-west-2",
+                            "label": "ExecutionsTimedOut"
+                        }
+                    ]
+                ],
+                "view": "singleValue",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Transcript SF - Executions Metrics",
+                "setPeriodToTimeRange": true,
+                "sparkline": false,
+                "trend": false
+            }
+        },
+        {
+            "type": "metric",
+            "x": 6,
+            "y": 66,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-snf-valid-ticket-metadata-sqs-SQSAgeOfOldestMessage-alarm-warning"
+                    ]
+                },
+                "region": "us-west-2",
+                "title": "Approximate Age Of Oldest Message - Orchestrator input SQS"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 66,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:us-west-2:654654430801:alarm:production-rec-snf-ticket-data-sqs-AgeOfOldestMessage-alarm-warning"
+                    ]
+                },
+                "region": "us-west-2",
+                "title": "Approximate Age Of Oldest Message - Normalization input SQS"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 30,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-lambda-ticket-metadata-input-validation-ticket-schema-validation-failure",
+                        "StoreAndForward",
+                        "production-rec-lambda-ticket-metadata-input-validation",
+                        "Source",
+                        "PLAYVOX",
+                        {
+                            "label": "Schema validation failure",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-tickets-with-missing-transcript",
+                        ".",
+                        "ticket-data-preprocessing-sf",
+                        {
+                            "label": "Missing transcript",
+                            "region": "us-west-2"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-lambda-ticket-metadata-transform-ticket-transformation-failure",
+                        ".",
+                        "production-rec-lambda-ticket-metadata-transform",
+                        "Source",
+                        "PLAYVOX",
+                        {
+                            "label": "Transformation failure",
+                            "region": "us-west-2",
+                            "color": "#fe6e73"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Sum",
+                "period": 300,
+                "title": "Ticket Metadata NonRetryable Errors"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 9,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        {
+                            "expression": "SEARCH('{ production-rec.service.metrics,Source, StoreAndForward, tenantId} MetricName=\"production-rec-lambda-ticket-preprocessing-ticket-sla-sum\"', 'Average', 5)",
+                            "label": "",
+                            "id": "e1",
+                            "region": "us-west-2",
+                            "color": "#08aad2",
+                            "period": 5
+                        }
+                    ]
+                ],
+                "sparkline": false,
+                "view": "table",
+                "stacked": false,
+                "region": "us-west-2",
+                "stat": "Average",
+                "period": 5,
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 300,
+                        "showUnits": false
+                    }
+                },
+                "setPeriodToTimeRange": true,
+                "title": "Ticket SLA per tenant",
+                "table": {
+                    "summaryColumns": [
+                        "AVG"
+                    ],
+                    "showTimeSeriesData": false,
+                    "stickySummary": true
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 12,
+            "y": 23,
+            "width": 12,
+            "height": 7,
+            "properties": {
+                "metrics": [
+                    [
+                        "production-rec.service.metrics",
+                        "production-rec-lambda-ticket-metadata-transform-invalid-input",
+                        "StoreAndForward",
+                        "production-rec-lambda-ticket-metadata-transform",
+                        "Source",
+                        "PLAYVOX",
+                        {
+                            "region": "us-west-2",
+                            "label": "invalid-input"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-lambda-ticket-metadata-transform-outdated-ticket",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "outdated-ticket"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-lambda-ticket-metadata-transform-missing-message-from-ddb",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "missing-message-from-ddb"
+                        }
+                    ],
+                    [
+                        ".",
+                        "production-rec-lambda-ticket-metadata-transform-ddb-failed-connection",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-west-2",
+                            "label": "ddb-failed-connection"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-west-2",
+                "title": "Metadata Transformation Lambda Failures",
+                "period": 300,
+                "stat": "Average"
+            }
+        }
+    ]
+}
