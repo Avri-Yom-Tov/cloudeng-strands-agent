@@ -12,6 +12,7 @@ from mcp import StdioServerParameters, stdio_client
 import os
 
 import sys
+import atexit
 
 from typing import Dict
 
@@ -59,7 +60,40 @@ time_tools = []
 
 cloudwatch_tools = []
 
+def cleanup_mcp_clients():
+    """Stop existing MCP clients to free resources"""
+    global time_mcp_client, cloudwatch_mcp_client, time_tools, cloudwatch_tools
+    
+    print("Cleaning up MCP clients...")
+    
+    if time_mcp_client:
+        try:
+            print("Stopping Time MCP client...")
+            # Check if stop method exists (it should for MCPClient)
+            if hasattr(time_mcp_client, 'stop'):
+                time_mcp_client.stop(exc_type=None, exc_val=None, exc_tb=None)
+            elif hasattr(time_mcp_client, 'close'):
+                time_mcp_client.close(exc_type=None, exc_val=None, exc_tb=None)
+        except Exception as e:
+            print(f"Error stopping Time MCP client: {e}")
+        time_mcp_client = None
+            
+    if cloudwatch_mcp_client:
+        try:
+            print("Stopping CloudWatch MCP client...")
+            if hasattr(cloudwatch_mcp_client, 'stop'):
+                cloudwatch_mcp_client.stop(exc_type=None, exc_val=None, exc_tb=None)
+            elif hasattr(cloudwatch_mcp_client, 'close'):
+                cloudwatch_mcp_client.close(exc_type=None, exc_val=None, exc_tb=None)
+        except Exception as e:
+            print(f"Error stopping CloudWatch MCP client: {e}")
+        cloudwatch_mcp_client = None
+            
+    time_tools = []
+    cloudwatch_tools = []
+    print("MCP clients cleanup completed.")
 
+atexit.register(cleanup_mcp_clients)
 
 def initialize_mcp_clients(aws_profile='wfoprod'):
 
@@ -67,7 +101,8 @@ def initialize_mcp_clients(aws_profile='wfoprod'):
 
     global time_mcp_client, cloudwatch_mcp_client, time_tools, cloudwatch_tools
 
-   
+    # Ensure any existing clients are cleaned up first
+    cleanup_mcp_clients()
 
     is_windows = sys.platform.startswith('win')
 
@@ -105,6 +140,13 @@ def initialize_mcp_clients(aws_profile='wfoprod'):
 
             # Set up CloudWatch MCP client for Windows
 
+            env_vars = os.environ.copy()
+            env_vars.update({
+                "FASTMCP_LOG_LEVEL": "ERROR",
+                "AWS_PROFILE": aws_profile,
+                "AWS_REGION": AWS_REGION
+            })
+
             cloudwatch_mcp_client = MCPClient(lambda: stdio_client(
 
                 StdioServerParameters(
@@ -113,11 +155,7 @@ def initialize_mcp_clients(aws_profile='wfoprod'):
 
                     args=["tool", "run", "--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server.exe"],
 
-                    env={
-                        "FASTMCP_LOG_LEVEL": "ERROR",
-                        "AWS_PROFILE": aws_profile,
-                        "AWS_REGION": AWS_REGION
-                    }
+                    env=env_vars
 
                 )
 
@@ -149,6 +187,13 @@ def initialize_mcp_clients(aws_profile='wfoprod'):
 
             # Set up CloudWatch MCP client (without .exe extension)
 
+            env_vars = os.environ.copy()
+            env_vars.update({
+                "FASTMCP_LOG_LEVEL": "ERROR",
+                "AWS_PROFILE": aws_profile,
+                "AWS_REGION": AWS_REGION
+            })
+
             cloudwatch_mcp_client = MCPClient(lambda: stdio_client(
 
                 StdioServerParameters(
@@ -157,11 +202,7 @@ def initialize_mcp_clients(aws_profile='wfoprod'):
 
                     args=["--from", "awslabs.cloudwatch-mcp-server@latest", "awslabs.cloudwatch-mcp-server"],
 
-                    env={
-                        "FASTMCP_LOG_LEVEL": "ERROR",
-                        "AWS_PROFILE": aws_profile,
-                        "AWS_REGION": AWS_REGION
-                    }
+                    env=env_vars
 
                 )
 
@@ -738,7 +779,9 @@ if __name__ == "__main__":
 
     # Initialize current AWS profile in session state
     if "current_aws_profile" not in st.session_state:
-        st.session_state.current_aws_profile = "wfoprod"
+        # Check query params
+        params = st.query_params
+        st.session_state.current_aws_profile = params.get("profile", "wfoprod")
 
     # Initialize MCP clients only once in session state or when profile changes
     if "mcp_initialized" not in st.session_state or st.session_state.get("profile_changed", False):
@@ -782,12 +825,9 @@ if __name__ == "__main__":
         
         if selected_profile != current_profile:
             if st.button("🔄 Switch Profile & Reload", type="primary", use_container_width=True):
-                st.session_state.current_aws_profile = selected_profile
-                st.session_state.profile_changed = True
-                st.session_state.mcp_initialized = False
-                st.session_state.messages = []
-                st.session_state.agent_messages = []
-                st.rerun()
+                cleanup_mcp_clients()
+                st.session_state.clear()
+                st.markdown(f'<meta http-equiv="refresh" content="0;url=?profile={selected_profile}">', unsafe_allow_html=True)
         
         st.markdown("---")
         st.markdown("### 📊 Daily Reports")
