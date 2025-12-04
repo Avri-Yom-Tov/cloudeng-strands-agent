@@ -113,8 +113,8 @@ def initialize_mcp_clients():
 
                     env={
                         "FASTMCP_LOG_LEVEL": "ERROR",
-                        "AWS_PROFILE": AWS_PROFILE_FOR_TOOLS,
-                        "AWS_REGION": AWS_REGION
+                        "AWS_PROFILE": 'wfoprod',
+                        "AWS_REGION": 'us-west-2'
                     }
 
                 )
